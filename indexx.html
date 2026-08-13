@@ -1,0 +1,4862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080b18">
+<title>NEXUS // Interactive Command Center</title>
+
+<style>
+/* =========================================================
+   ROOT
+========================================================= */
+
+:root {
+    --bg: #070912;
+    --bg-soft: #0c1020;
+    --panel: rgba(15, 20, 39, 0.72);
+    --panel-solid: #10162a;
+    --panel-hover: rgba(24, 31, 58, 0.88);
+
+    --text: #f4f7ff;
+    --muted: #8e99b8;
+    --border: rgba(255,255,255,0.08);
+
+    --primary: #7c5cff;
+    --secondary: #00e5ff;
+    --success: #24e08a;
+    --warning: #ffc857;
+    --danger: #ff5577;
+
+    --shadow:
+        0 20px 60px rgba(0,0,0,.35),
+        inset 0 1px 0 rgba(255,255,255,.03);
+
+    --radius: 20px;
+    --sidebar: 260px;
+
+    --transition: .3s cubic-bezier(.2,.8,.2,1);
+}
+
+body.light {
+    --bg: #eef2ff;
+    --bg-soft: #e4e9fa;
+    --panel: rgba(255,255,255,.75);
+    --panel-solid: #ffffff;
+    --panel-hover: #ffffff;
+
+    --text: #10162a;
+    --muted: #64708f;
+    --border: rgba(20,30,70,.1);
+
+    --shadow:
+        0 20px 50px rgba(37,49,100,.12),
+        inset 0 1px 0 rgba(255,255,255,.8);
+}
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100vh;
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    color: var(--text);
+    background:
+        radial-gradient(circle at 20% 20%, rgba(124,92,255,.12), transparent 30%),
+        radial-gradient(circle at 80% 80%, rgba(0,229,255,.08), transparent 30%),
+        var(--bg);
+
+    overflow-x: hidden;
+    transition:
+        background var(--transition),
+        color var(--transition);
+}
+
+button,
+input {
+    font: inherit;
+}
+
+button {
+    border: none;
+    cursor: pointer;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* =========================================================
+   PARTICLE CANVAS
+========================================================= */
+
+#particleCanvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -2;
+    opacity: .55;
+}
+
+.grid-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+
+    background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+
+    background-size: 45px 45px;
+
+    mask-image: linear-gradient(to bottom, black, transparent 85%);
+}
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+        var(--primary),
+        var(--secondary)
+    );
+    border-radius: 99px;
+}
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+
+    width: var(--sidebar);
+
+    padding: 24px 16px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(10,14,30,.96),
+            rgba(7,9,18,.93)
+        );
+
+    border-right: 1px solid var(--border);
+
+    backdrop-filter: blur(25px);
+
+    z-index: 100;
+
+    transition:
+        transform var(--transition),
+        width var(--transition);
+}
+
+body.light .sidebar {
+    background: rgba(248,250,255,.88);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 8px 12px 28px;
+}
+
+.logo-symbol {
+    width: 38px;
+    height: 38px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 12px;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            var(--secondary)
+        );
+
+    box-shadow:
+        0 0 30px rgba(124,92,255,.45);
+}
+
+.logo-text {
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: 3px;
+}
+
+.logo-text span {
+    color: var(--secondary);
+}
+
+.nav-title {
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 2px;
+    font-weight: 800;
+
+    padding: 16px 12px 8px;
+}
+
+.nav-item {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 12px;
+
+    margin-bottom: 4px;
+
+    color: var(--muted);
+
+    background: transparent;
+
+    border-radius: 13px;
+
+    transition: var(--transition);
+
+    text-align: left;
+}
+
+.nav-item:hover {
+    color: var(--text);
+    background: rgba(255,255,255,.05);
+    transform: translateX(3px);
+}
+
+.nav-item.active {
+    color: white;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(124,92,255,.25),
+            rgba(0,229,255,.06)
+        );
+
+    box-shadow:
+        inset 3px 0 var(--primary),
+        0 10px 30px rgba(124,92,255,.08);
+}
+
+.nav-icon {
+    width: 22px;
+    text-align: center;
+}
+
+.sidebar-bottom {
+    position: absolute;
+    bottom: 20px;
+    left: 16px;
+    right: 16px;
+}
+
+.system-status {
+    padding: 15px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 16px;
+
+    background: rgba(255,255,255,.025);
+}
+
+.status-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    font-size: 12px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+
+    background: var(--success);
+
+    box-shadow:
+        0 0 10px var(--success);
+
+    animation: pulse 1.7s infinite;
+}
+
+@keyframes pulse {
+    50% {
+        opacity: .35;
+        transform: scale(.7);
+    }
+}
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.main {
+    margin-left: var(--sidebar);
+    min-height: 100vh;
+
+    transition: margin var(--transition);
+}
+
+.topbar {
+    position: sticky;
+    top: 0;
+
+    height: 76px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 30px;
+
+    background:
+        rgba(7,9,18,.62);
+
+    backdrop-filter: blur(25px);
+
+    border-bottom:
+        1px solid var(--border);
+
+    z-index: 50;
+}
+
+body.light .topbar {
+    background: rgba(238,242,255,.65);
+}
+
+.search {
+    position: relative;
+
+    width: min(430px, 45vw);
+}
+
+.search input {
+    width: 100%;
+
+    padding: 12px 45px 12px 17px;
+
+    color: var(--text);
+
+    background: rgba(255,255,255,.045);
+
+    border:
+        1px solid var(--border);
+
+    outline: none;
+
+    border-radius: 13px;
+
+    transition: var(--transition);
+}
+
+.search input:focus {
+    border-color: rgba(124,92,255,.65);
+
+    box-shadow:
+        0 0 0 4px rgba(124,92,255,.08);
+}
+
+.search-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: var(--muted);
+}
+
+.top-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.icon-btn {
+    width: 42px;
+    height: 42px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 13px;
+
+    color: var(--muted);
+
+    background: rgba(255,255,255,.04);
+
+    border:
+        1px solid var(--border);
+
+    transition: var(--transition);
+}
+
+.icon-btn:hover {
+    color: white;
+    transform: translateY(-2px);
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            #5a43db
+        );
+
+    box-shadow:
+        0 10px 30px rgba(124,92,255,.3);
+}
+
+.avatar {
+    width: 42px;
+    height: 42px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    color: white;
+    font-weight: 900;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff5da2,
+            #7c5cff,
+            #00e5ff
+        );
+
+    box-shadow:
+        0 0 25px rgba(124,92,255,.35);
+}
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.content {
+    padding: 30px;
+    max-width: 1800px;
+    margin: auto;
+}
+
+.hero {
+    position: relative;
+
+    padding: 38px;
+
+    overflow: hidden;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 28px;
+
+    background:
+        radial-gradient(
+            circle at 85% 25%,
+            rgba(0,229,255,.15),
+            transparent 25%
+        ),
+        radial-gradient(
+            circle at 20% 100%,
+            rgba(124,92,255,.2),
+            transparent 35%
+        ),
+        var(--panel);
+
+    box-shadow: var(--shadow);
+
+    margin-bottom: 25px;
+}
+
+.hero::before {
+    content: "";
+
+    position: absolute;
+
+    width: 250px;
+    height: 250px;
+
+    right: -80px;
+    top: -100px;
+
+    border-radius: 50%;
+
+    border:
+        1px solid rgba(0,229,255,.25);
+
+    box-shadow:
+        0 0 80px rgba(0,229,255,.1);
+
+    animation: floatOrb 7s ease-in-out infinite;
+}
+
+@keyframes floatOrb {
+    50% {
+        transform: translate(-30px, 35px);
+    }
+}
+
+.eyebrow {
+    color: var(--secondary);
+
+    font-size: 11px;
+    font-weight: 900;
+
+    letter-spacing: 3px;
+
+    margin-bottom: 12px;
+}
+
+.hero h1 {
+    font-size:
+        clamp(30px, 4vw, 58px);
+
+    line-height: 1;
+
+    letter-spacing: -2px;
+
+    margin-bottom: 16px;
+}
+
+.gradient-text {
+    background:
+        linear-gradient(
+            90deg,
+            #fff,
+            var(--secondary),
+            var(--primary),
+            #fff
+        );
+
+    background-size: 300%;
+
+    -webkit-background-clip: text;
+    color: transparent;
+
+    animation: gradientFlow 5s linear infinite;
+}
+
+@keyframes gradientFlow {
+    to {
+        background-position: 300%;
+    }
+}
+
+.hero p {
+    max-width: 700px;
+
+    color: var(--muted);
+
+    line-height: 1.7;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 12px;
+
+    margin-top: 25px;
+
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 12px 18px;
+
+    color: white;
+
+    border-radius: 12px;
+
+    font-weight: 800;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            #5941dd
+        );
+
+    box-shadow:
+        0 10px 30px rgba(124,92,255,.22);
+
+    transition: var(--transition);
+}
+
+.btn:hover {
+    transform: translateY(-3px) scale(1.02);
+
+    box-shadow:
+        0 15px 40px rgba(124,92,255,.35);
+}
+
+.btn.secondary {
+    color: var(--text);
+    background: rgba(255,255,255,.05);
+
+    border:
+        1px solid var(--border);
+
+    box-shadow: none;
+}
+
+/* =========================================================
+   STAT GRID
+========================================================= */
+
+.stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 18px;
+
+    margin-bottom: 25px;
+}
+
+.card {
+    position: relative;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: var(--radius);
+
+    background:
+        var(--panel);
+
+    box-shadow: var(--shadow);
+
+    backdrop-filter: blur(20px);
+
+    transition: var(--transition);
+
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+
+    border-color:
+        rgba(124,92,255,.28);
+
+    background:
+        var(--panel-hover);
+}
+
+.stat-card {
+    padding: 22px;
+}
+
+.stat-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-icon {
+    width: 43px;
+    height: 43px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 13px;
+
+    color: var(--secondary);
+
+    background:
+        rgba(0,229,255,.08);
+
+    border:
+        1px solid rgba(0,229,255,.12);
+}
+
+.stat-label {
+    margin-top: 20px;
+
+    color: var(--muted);
+
+    font-size: 12px;
+}
+
+.stat-number {
+    margin-top: 5px;
+
+    font-size: 30px;
+    font-weight: 900;
+}
+
+.stat-change {
+    margin-top: 8px;
+
+    font-size: 11px;
+    color: var(--success);
+}
+
+/* =========================================================
+   DASHBOARD GRID
+========================================================= */
+
+.dashboard-grid {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.6fr)
+        minmax(300px, .9fr);
+
+    gap: 20px;
+
+    margin-bottom: 20px;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 20px 22px;
+
+    border-bottom:
+        1px solid var(--border);
+}
+
+.card-title {
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.card-subtitle {
+    margin-top: 4px;
+
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+.chart-container {
+    height: 340px;
+
+    padding: 20px;
+}
+
+#performanceChart {
+    width: 100%;
+    height: 100%;
+}
+
+/* =========================================================
+   QUICK METRICS
+========================================================= */
+
+.metrics {
+    padding: 22px;
+}
+
+.metric {
+    margin-bottom: 22px;
+}
+
+.metric:last-child {
+    margin-bottom: 0;
+}
+
+.metric-head {
+    display: flex;
+    justify-content: space-between;
+
+    margin-bottom: 9px;
+
+    font-size: 12px;
+}
+
+.metric-head span:last-child {
+    color: var(--secondary);
+    font-weight: 900;
+}
+
+.progress {
+    height: 8px;
+
+    border-radius: 99px;
+
+    overflow: hidden;
+
+    background:
+        rgba(255,255,255,.06);
+}
+
+.progress-bar {
+    height: 100%;
+
+    border-radius: inherit;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--primary),
+            var(--secondary)
+        );
+
+    box-shadow:
+        0 0 15px rgba(0,229,255,.25);
+
+    transition: width 1.5s cubic-bezier(.2,.8,.2,1);
+}
+
+/* =========================================================
+   LOWER GRID
+========================================================= */
+
+.lower-grid {
+    display: grid;
+
+    grid-template-columns:
+        1.1fr
+        1fr
+        .8fr;
+
+    gap: 20px;
+}
+
+/* =========================================================
+   TASKS
+========================================================= */
+
+.task-input {
+    display: flex;
+    gap: 8px;
+
+    padding: 15px 20px;
+}
+
+.task-input input {
+    flex: 1;
+
+    min-width: 0;
+
+    padding: 11px 13px;
+
+    color: var(--text);
+
+    background:
+        rgba(255,255,255,.04);
+
+    border:
+        1px solid var(--border);
+
+    outline: none;
+
+    border-radius: 10px;
+}
+
+.task-add {
+    width: 42px;
+
+    border-radius: 10px;
+
+    color: white;
+
+    background:
+        var(--primary);
+
+    font-size: 20px;
+}
+
+.task-list {
+    max-height: 360px;
+    overflow-y: auto;
+    padding: 0 12px 12px;
+}
+
+.task {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 12px;
+
+    margin-bottom: 6px;
+
+    border-radius: 12px;
+
+    transition: var(--transition);
+}
+
+.task:hover {
+    background:
+        rgba(255,255,255,.04);
+}
+
+.task-check {
+    width: 21px;
+    height: 21px;
+
+    flex-shrink: 0;
+
+    border:
+        1px solid rgba(124,92,255,.5);
+
+    border-radius: 6px;
+
+    display: grid;
+    place-items: center;
+
+    color: white;
+
+    background: transparent;
+}
+
+.task.completed .task-check {
+    background:
+        var(--success);
+
+    border-color:
+        var(--success);
+}
+
+.task.completed .task-text {
+    text-decoration: line-through;
+    color: var(--muted);
+}
+
+.task-text {
+    flex: 1;
+
+    font-size: 13px;
+}
+
+.delete-task {
+    color: var(--muted);
+
+    background: transparent;
+
+    opacity: 0;
+
+    transition: var(--transition);
+}
+
+.task:hover .delete-task {
+    opacity: 1;
+}
+
+.delete-task:hover {
+    color: var(--danger);
+}
+
+/* =========================================================
+   ACTIVITY
+========================================================= */
+
+.activity-list {
+    padding: 10px 20px 20px;
+}
+
+.activity {
+    position: relative;
+
+    display: flex;
+    gap: 12px;
+
+    padding: 13px 0;
+
+    border-bottom:
+        1px solid var(--border);
+}
+
+.activity:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    width: 34px;
+    height: 34px;
+
+    display: grid;
+    place-items: center;
+
+    flex-shrink: 0;
+
+    border-radius: 10px;
+
+    background:
+        rgba(124,92,255,.12);
+}
+
+.activity-text {
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.activity-time {
+    color: var(--muted);
+    font-size: 10px;
+}
+
+/* =========================================================
+   CLOCK
+========================================================= */
+
+.clock-card {
+    min-height: 280px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    padding: 25px;
+}
+
+.clock-ring {
+    position: relative;
+
+    width: 160px;
+    height: 160px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    background:
+        conic-gradient(
+            var(--secondary),
+            var(--primary),
+            transparent,
+            var(--secondary)
+        );
+
+    animation: rotateRing 8s linear infinite;
+
+    box-shadow:
+        0 0 50px rgba(0,229,255,.12);
+}
+
+.clock-ring::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 5px;
+
+    border-radius: 50%;
+
+    background: var(--panel-solid);
+}
+
+.clock-content {
+    position: relative;
+    z-index: 2;
+}
+
+.clock-time {
+    font-size: 25px;
+    font-weight: 900;
+}
+
+.clock-date {
+    margin-top: 6px;
+
+    color: var(--muted);
+
+    font-size: 10px;
+}
+
+@keyframes rotateRing {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* =========================================================
+   ACTIVITY / NETWORK PANEL
+========================================================= */
+
+.network-card {
+    padding-bottom: 20px;
+}
+
+.network-visual {
+    height: 190px;
+
+    margin: 20px;
+
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+
+    border-bottom:
+        1px solid var(--border);
+}
+
+.network-bar {
+    flex: 1;
+
+    min-width: 2px;
+
+    border-radius: 5px 5px 0 0;
+
+    background:
+        linear-gradient(
+            to top,
+            var(--primary),
+            var(--secondary)
+        );
+
+    opacity: .65;
+
+    transition:
+        height .6s ease,
+        opacity .2s ease;
+}
+
+.network-bar:hover {
+    opacity: 1;
+}
+
+/* =========================================================
+   MUSIC PLAYER
+========================================================= */
+
+.music {
+    padding: 22px;
+}
+
+.album {
+    height: 160px;
+
+    border-radius: 18px;
+
+    display: grid;
+    place-items: center;
+
+    font-size: 55px;
+
+    background:
+        radial-gradient(
+            circle at 30% 20%,
+            #fff3,
+            transparent 20%
+        ),
+        linear-gradient(
+            135deg,
+            #7c5cff,
+            #ff4da6,
+            #00e5ff
+        );
+
+    box-shadow:
+        0 20px 50px rgba(124,92,255,.2);
+}
+
+.song {
+    margin-top: 17px;
+
+    font-weight: 900;
+}
+
+.artist {
+    margin-top: 4px;
+
+    color: var(--muted);
+
+    font-size: 12px;
+}
+
+.music-progress {
+    height: 5px;
+
+    margin: 20px 0 10px;
+
+    background: rgba(255,255,255,.08);
+
+    border-radius: 99px;
+
+    overflow: hidden;
+}
+
+.music-progress-bar {
+    width: 32%;
+
+    height: 100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--primary),
+            var(--secondary)
+        );
+}
+
+.music-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 15px;
+}
+
+.play {
+    width: 48px;
+    height: 48px;
+
+    border-radius: 50%;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            var(--secondary)
+        );
+
+    box-shadow:
+        0 10px 30px rgba(124,92,255,.3);
+}
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.modal {
+    position: fixed;
+    inset: 0;
+
+    display: grid;
+    place-items: center;
+
+    padding: 20px;
+
+    background:
+        rgba(0,0,0,.65);
+
+    backdrop-filter: blur(10px);
+
+    z-index: 500;
+
+    opacity: 0;
+    visibility: hidden;
+
+    transition: var(--transition);
+}
+
+.modal.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-box {
+    width: min(600px, 100%);
+
+    padding: 25px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 24px;
+
+    background:
+        var(--panel-solid);
+
+    box-shadow:
+        0 30px 100px rgba(0,0,0,.45);
+
+    transform:
+        translateY(20px)
+        scale(.96);
+
+    transition: var(--transition);
+}
+
+.modal.open .modal-box {
+    transform:
+        translateY(0)
+        scale(1);
+}
+
+.modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 20px;
+}
+
+.close {
+    width: 35px;
+    height: 35px;
+
+    border-radius: 10px;
+
+    color: var(--muted);
+
+    background:
+        rgba(255,255,255,.05);
+}
+
+/* =========================================================
+   COMMAND PALETTE
+========================================================= */
+
+.command {
+    position: fixed;
+    inset: 0;
+
+    display: grid;
+    place-items: start center;
+
+    padding-top: 12vh;
+
+    background:
+        rgba(0,0,0,.7);
+
+    backdrop-filter: blur(12px);
+
+    z-index: 1000;
+
+    opacity: 0;
+    visibility: hidden;
+
+    transition: var(--transition);
+}
+
+.command.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.command-box {
+    width: min(650px, 90vw);
+
+    overflow: hidden;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 20px;
+
+    background:
+        var(--panel-solid);
+
+    box-shadow:
+        0 40px 100px rgba(0,0,0,.5);
+
+    transform: translateY(-20px);
+
+    transition: var(--transition);
+}
+
+.command.open .command-box {
+    transform: translateY(0);
+}
+
+.command-search {
+    width: 100%;
+
+    padding: 18px 20px;
+
+    color: var(--text);
+
+    background: transparent;
+
+    border: none;
+    outline: none;
+
+    border-bottom:
+        1px solid var(--border);
+
+    font-size: 16px;
+}
+
+.command-list {
+    padding: 10px;
+}
+
+.command-item {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 13px;
+
+    color: var(--muted);
+
+    background: transparent;
+
+    border-radius: 11px;
+
+    text-align: left;
+}
+
+.command-item:hover {
+    color: white;
+
+    background:
+        rgba(124,92,255,.15);
+}
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+.toast-container {
+    position: fixed;
+
+    right: 20px;
+    bottom: 20px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    z-index: 2000;
+}
+
+.toast {
+    min-width: 280px;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 14px 17px;
+
+    color: var(--text);
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 14px;
+
+    background:
+        rgba(15,20,39,.92);
+
+    backdrop-filter: blur(20px);
+
+    box-shadow:
+        0 20px 50px rgba(0,0,0,.25);
+
+    animation:
+        toastIn .4s ease forwards;
+}
+
+.toast.hide {
+    animation:
+        toastOut .35s ease forwards;
+}
+
+@keyframes toastIn {
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+}
+
+@keyframes toastOut {
+    to {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+}
+
+/* =========================================================
+   SETTINGS
+========================================================= */
+
+.settings {
+    display: grid;
+    gap: 16px;
+}
+
+.setting-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 15px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 14px;
+
+    background:
+        rgba(255,255,255,.025);
+}
+
+.setting-info strong {
+    display: block;
+    font-size: 13px;
+}
+
+.setting-info span {
+    display: block;
+
+    margin-top: 4px;
+
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+.switch {
+    position: relative;
+
+    width: 48px;
+    height: 26px;
+}
+
+.switch input {
+    opacity: 0;
+}
+
+.slider {
+    position: absolute;
+    inset: 0;
+
+    cursor: pointer;
+
+    border-radius: 99px;
+
+    background: #30384e;
+
+    transition: .3s;
+}
+
+.slider::before {
+    content: "";
+
+    position: absolute;
+
+    width: 20px;
+    height: 20px;
+
+    left: 3px;
+    top: 3px;
+
+    border-radius: 50%;
+
+    background: white;
+
+    transition: .3s;
+}
+
+.switch input:checked + .slider {
+    background: var(--primary);
+}
+
+.switch input:checked + .slider::before {
+    transform: translateX(22px);
+}
+
+.color-picker {
+    display: flex;
+    gap: 8px;
+}
+
+.color {
+    width: 25px;
+    height: 25px;
+
+    border-radius: 50%;
+
+    cursor: pointer;
+
+    border: 2px solid transparent;
+}
+
+.color.active {
+    border-color: white;
+    box-shadow: 0 0 0 2px var(--primary);
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+.mobile-menu {
+    display: none;
+}
+
+@media (max-width: 1200px) {
+    .stats {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .lower-grid {
+        grid-template-columns:
+            1fr 1fr;
+    }
+
+    .music-card {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 900px) {
+    :root {
+        --sidebar: 250px;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .lower-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .music-card {
+        grid-column: auto;
+    }
+}
+
+@media (max-width: 700px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    .main {
+        margin-left: 0;
+    }
+
+    .mobile-menu {
+        display: grid;
+    }
+
+    .topbar {
+        padding: 0 15px;
+    }
+
+    .search {
+        display: none;
+    }
+
+    .content {
+        padding: 15px;
+    }
+
+    .hero {
+        padding: 25px;
+    }
+
+    .stats {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 16px;
+    }
+
+    .stat-number {
+        font-size: 24px;
+    }
+
+    .hero h1 {
+        font-size: 36px;
+    }
+}
+
+@media (max-width: 450px) {
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .top-actions .icon-btn:nth-child(2) {
+        display: none;
+    }
+}
+
+/* =========================================================
+   SECTION ANIMATION
+========================================================= */
+
+.reveal {
+    opacity: 0;
+    transform: translateY(20px);
+
+    animation:
+        reveal .8s forwards;
+}
+
+@keyframes reveal {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================================================
+   RIPPLE
+========================================================= */
+
+.ripple {
+    position: absolute;
+
+    width: 5px;
+    height: 5px;
+
+    border-radius: 50%;
+
+    background: rgba(255,255,255,.5);
+
+    transform: scale(0);
+
+    animation: ripple .6s linear;
+
+    pointer-events: none;
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(40);
+        opacity: 0;
+    }
+}
+
+/* =========================================================
+   EASTER EGG
+========================================================= */
+
+.matrix-mode {
+    animation: matrixFlash .4s infinite alternate;
+}
+
+@keyframes matrixFlash {
+    from {
+        filter: hue-rotate(0deg);
+    }
+
+    to {
+        filter: hue-rotate(90deg);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="particleCanvas"></canvas>
+<div class="grid-overlay"></div>
+
+<!-- =======================================================
+     SIDEBAR
+======================================================= -->
+
+<aside class="sidebar" id="sidebar">
+
+    <div class="logo">
+        <div class="logo-symbol">N</div>
+
+        <div class="logo-text">
+            NE<span>X</span>US
+        </div>
+    </div>
+
+    <div class="nav-title">
+        COMMAND
+    </div>
+
+    <button class="nav-item active" data-section="dashboard">
+        <span class="nav-icon">⌂</span>
+        <span>Dashboard</span>
+    </button>
+
+    <button class="nav-item" data-section="analytics">
+        <span class="nav-icon">◈</span>
+        <span>Analytics</span>
+    </button>
+
+    <button class="nav-item" data-section="projects">
+        <span class="nav-icon">▣</span>
+        <span>Projects</span>
+    </button>
+
+    <button class="nav-item" data-section="messages">
+        <span class="nav-icon">◌</span>
+        <span>Messages</span>
+    </button>
+
+    <div class="nav-title">
+        SYSTEM
+    </div>
+
+    <button class="nav-item" id="settingsButton">
+        <span class="nav-icon">⚙</span>
+        <span>Settings</span>
+    </button>
+
+    <button class="nav-item" id="commandButton">
+        <span class="nav-icon">⌘</span>
+        <span>Command Center</span>
+    </button>
+
+    <div class="sidebar-bottom">
+
+        <div class="system-status">
+
+            <div class="status-line">
+                <span>System Status</span>
+
+                <span class="status-dot"></span>
+            </div>
+
+            <div style="
+                color:var(--muted);
+                font-size:10px;
+                margin-top:7px;
+            ">
+                ALL SYSTEMS OPERATIONAL
+            </div>
+
+        </div>
+
+    </div>
+
+</aside>
+
+<!-- =======================================================
+     MAIN
+======================================================= -->
+
+<main class="main">
+
+    <!-- TOPBAR -->
+
+    <header class="topbar">
+
+        <div style="display:flex;align-items:center;gap:10px;">
+
+            <button
+                class="icon-btn mobile-menu"
+                id="mobileMenu"
+            >
+                ☰
+            </button>
+
+            <div class="search">
+
+                <input
+                    id="searchInput"
+                    placeholder="Search anything..."
+                >
+
+                <span class="search-icon">
+                    ⌕
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="top-actions">
+
+            <button
+                class="icon-btn"
+                id="themeToggle"
+                title="Toggle theme"
+            >
+                ☾
+            </button>
+
+            <button
+                class="icon-btn"
+                id="notificationButton"
+                title="Notifications"
+            >
+                ♢
+            </button>
+
+            <div class="avatar">
+                NX
+            </div>
+
+        </div>
+
+    </header>
+
+    <!-- CONTENT -->
+
+    <section class="content">
+
+        <!-- HERO -->
+
+        <div class="hero reveal">
+
+            <div class="eyebrow">
+                NEXUS COMMAND CENTER // ONLINE
+            </div>
+
+            <h1>
+                Welcome back,
+                <span class="gradient-text">
+                    Operator.
+                </span>
+            </h1>
+
+            <p>
+                Your digital command center is online.
+                Monitor your systems, manage projects,
+                analyze performance and control your
+                environment from one interactive interface.
+            </p>
+
+            <div class="hero-buttons">
+
+                <button class="btn" id="launchButton">
+                    🚀 Launch System
+                </button>
+
+                <button class="btn secondary" id="commandHero">
+                    ⌘ Command Palette
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- STATS -->
+
+        <div class="stats">
+
+            <div class="card stat-card reveal">
+
+                <div class="stat-top">
+
+                    <div>
+                        <div class="stat-label">
+                            ACTIVE USERS
+                        </div>
+
+                        <div
+                            class="stat-number counter"
+                            data-target="24891"
+                        >
+                            0
+                        </div>
+                    </div>
+
+                    <div class="stat-icon">
+                        ◉
+                    </div>
+
+                </div>
+
+                <div class="stat-change">
+                    ↑ 18.4% this month
+                </div>
+
+            </div>
+
+            <div class="card stat-card reveal">
+
+                <div class="stat-top">
+
+                    <div>
+                        <div class="stat-label">
+                            PROJECTS
+                        </div>
+
+                        <div
+                            class="stat-number counter"
+                            data-target="147"
+                        >
+                            0
+                        </div>
+                    </div>
+
+                    <div class="stat-icon">
+                        ◈
+                    </div>
+
+                </div>
+
+                <div class="stat-change">
+                    ↑ 7 new this week
+                </div>
+
+            </div>
+
+            <div class="card stat-card reveal">
+
+                <div class="stat-top">
+
+                    <div>
+                        <div class="stat-label">
+                            SYSTEM LOAD
+                        </div>
+
+                        <div
+                            class="stat-number"
+                            id="systemLoad"
+                        >
+                            42%
+                        </div>
+                    </div>
+
+                    <div class="stat-icon">
+                        ◌
+                    </div>
+
+                </div>
+
+                <div class="stat-change">
+                    ↓ 5.2% optimized
+                </div>
+
+            </div>
+
+            <div class="card stat-card reveal">
+
+                <div class="stat-top">
+
+                    <div>
+                        <div class="stat-label">
+                            REVENUE
+                        </div>
+
+                        <div
+                            class="stat-number counter"
+                            data-target="89240"
+                            data-prefix="$"
+                        >
+                            $0
+                        </div>
+                    </div>
+
+                    <div class="stat-icon">
+                        $
+                    </div>
+
+                </div>
+
+                <div class="stat-change">
+                    ↑ 23.7% growth
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- MAIN DASHBOARD -->
+
+        <div class="dashboard-grid">
+
+            <!-- CHART -->
+
+            <div class="card reveal">
+
+                <div class="card-header">
+
+                    <div>
+                        <div class="card-title">
+                            Performance Matrix
+                        </div>
+
+                        <div class="card-subtitle">
+                            Real-time system performance
+                        </div>
+                    </div>
+
+                    <select
+                        id="chartRange"
+                        style="
+                            color:var(--text);
+                            background:rgba(255,255,255,.05);
+                            border:1px solid var(--border);
+                            border-radius:8px;
+                            padding:7px;
+                            outline:none;
+                        "
+                    >
+                        <option>7 Days</option>
+                        <option>30 Days</option>
+                        <option>90 Days</option>
+                    </select>
+
+                </div>
+
+                <div class="chart-container">
+
+                    <canvas id="performanceChart"></canvas>
+
+                </div>
+
+            </div>
+
+            <!-- METRICS -->
+
+            <div class="card reveal">
+
+                <div class="card-header">
+
+                    <div>
+                        <div class="card-title">
+                            Resource Monitor
+                        </div>
+
+                        <div class="card-subtitle">
+                            Live infrastructure metrics
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="metrics">
+
+                    <div class="metric">
+
+                        <div class="metric-head">
+                            <span>CPU</span>
+                            <span id="cpuValue">68%</span>
+                        </div>
+
+                        <div class="progress">
+                            <div
+                                class="progress-bar"
+                                id="cpuBar"
+                                style="width:68%"
+                            ></div>
+                        </div>
+
+                    </div>
+
+                    <div class="metric">
+
+                        <div class="metric-head">
+                            <span>MEMORY</span>
+                            <span id="ramValue">74%</span>
+                        </div>
+
+                        <div class="progress">
+                            <div
+                                class="progress-bar"
+                                id="ramBar"
+                                style="width:74%"
+                            ></div>
+                        </div>
+
+                    </div>
+
+                    <div class="metric">
+
+                        <div class="metric-head">
+                            <span>STORAGE</span>
+                            <span>53%</span>
+                        </div>
+
+                        <div class="progress">
+                            <div
+                                class="progress-bar"
+                                style="width:53%"
+                            ></div>
+                        </div>
+
+                    </div>
+
+                    <div class="metric">
+
+                        <div class="metric-head">
+                            <span>NETWORK</span>
+                            <span id="networkValue">
+                                81%
+                            </span>
+                        </div>
+
+                        <div class="progress">
+                            <div
+                                class="progress-bar"
+                                id="networkBar"
+                                style="width:81%"
+                            ></div>
+                        </div>
+
+                    </div>
+
+                    <div class="metric">
+
+                        <div class="metric-head">
+                            <span>DATABASE</span>
+                            <span>92%</span>
+                        </div>
+
+                        <div class="progress">
+                            <div
+                                class="progress-bar"
+                                style="width:92%"
+                            ></div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- LOWER -->
+
+        <div class="lower-grid">
+
+            <!-- TASK MANAGER -->
+
+            <div class="card reveal">
+
+                <div class="card-header">
+
+                    <div>
+                        <div class="card-title">
+                            Mission Tasks
+                        </div>
+
+                        <div class="card-subtitle">
+                            Manage your active objectives
+                        </div>
+                    </div>
+
+                    <span
+                        id="taskCount"
+                        style="
+                            color:var(--secondary);
+                            font-size:11px;
+                            font-weight:900;
+                        "
+                    >
+                        0 ACTIVE
+                    </span>
+
+                </div>
+
+                <div class="task-input">
+
+                    <input
+                        id="taskInput"
+                        placeholder="Enter new task..."
+                    >
+
+                    <button
+                        class="task-add"
+                        id="addTask"
+                    >
+                        +
+                    </button>
+
+                </div>
+
+                <div
+                    class="task-list"
+                    id="taskList"
+                ></div>
+
+            </div>
+
+            <!-- ACTIVITY -->
+
+            <div class="card reveal">
+
+                <div class="card-header">
+
+                    <div>
+                        <div class="card-title">
+                            Live Activity
+                        </div>
+
+                        <div class="card-subtitle">
+                            Latest system events
+                        </div>
+                    </div>
+
+                    <span
+                        class="status-dot"
+                    ></span>
+
+                </div>
+
+                <div
+                    class="activity-list"
+                    id="activityList"
+                >
+
+                    <div class="activity">
+
+                        <div class="activity-icon">
+                            🚀
+                        </div>
+
+                        <div>
+                            <div class="activity-text">
+                                Deployment successfully completed.
+                            </div>
+
+                            <div class="activity-time">
+                                2 minutes ago
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="activity">
+
+                        <div class="activity-icon">
+                            🔐
+                        </div>
+
+                        <div>
+                            <div class="activity-text">
+                                Security protocol updated.
+                            </div>
+
+                            <div class="activity-time">
+                                11 minutes ago
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="activity">
+
+                        <div class="activity-icon">
+                            ⚡
+                        </div>
+
+                        <div>
+                            <div class="activity-text">
+                                Performance optimization completed.
+                            </div>
+
+                            <div class="activity-time">
+                                27 minutes ago
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="activity">
+
+                        <div class="activity-icon">
+                            👤
+                        </div>
+
+                        <div>
+                            <div class="activity-text">
+                                New operator joined the network.
+                            </div>
+
+                            <div class="activity-time">
+                                42 minutes ago
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- CLOCK -->
+
+            <div class="card clock-card reveal">
+
+                <div class="clock-ring">
+
+                    <div class="clock-content">
+
+                        <div
+                            class="clock-time"
+                            id="clock"
+                        >
+                            00:00:00
+                        </div>
+
+                        <div
+                            class="clock-date"
+                            id="date"
+                        >
+                            Loading...
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div
+                    style="
+                        margin-top:18px;
+                        color:var(--muted);
+                        font-size:10px;
+                        letter-spacing:2px;
+                    "
+                >
+                    LOCAL SYSTEM TIME
+                </div>
+
+            </div>
+
+            <!-- NETWORK -->
+
+            <div class="card network-card reveal">
+
+                <div class="card-header">
+
+                    <div>
+                        <div class="card-title">
+                            Network Pulse
+                        </div>
+
+                        <div class="card-subtitle">
+                            Traffic activity
+                        </div>
+                    </div>
+
+                </div>
+
+                <div
+                    class="network-visual"
+                    id="networkVisual"
+                ></div>
+
+            </div>
+
+            <!-- MUSIC -->
+
+            <div class="card music-card reveal">
+
+                <div class="card-header">
+
+                    <div>
+                        <div class="card-title">
+                            Neural Audio
+                        </div>
+
+                        <div class="card-subtitle">
+                            Focus mode
+                        </div>
+                    </div>
+
+                    <span>
+                        ♪
+                    </span>
+
+                </div>
+
+                <div class="music">
+
+                    <div class="album">
+                        ◉
+                    </div>
+
+                    <div class="song">
+                        Digital Horizon
+                    </div>
+
+                    <div class="artist">
+                        NEXUS SYNTHWAVE
+                    </div>
+
+                    <div class="music-progress">
+
+                        <div
+                            class="music-progress-bar"
+                            id="musicProgress"
+                        ></div>
+
+                    </div>
+
+                    <div
+                        style="
+                            display:flex;
+                            justify-content:space-between;
+                            color:var(--muted);
+                            font-size:9px;
+                            margin-bottom:12px;
+                        "
+                    >
+                        <span>01:32</span>
+                        <span>04:27</span>
+                    </div>
+
+                    <div class="music-controls">
+
+                        <button
+                            class="icon-btn"
+                            id="prevSong"
+                        >
+                            ◀
+                        </button>
+
+                        <button
+                            class="play"
+                            id="playButton"
+                        >
+                            ▶
+                        </button>
+
+                        <button
+                            class="icon-btn"
+                            id="nextSong"
+                        >
+                            ▶
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<!-- =======================================================
+     SETTINGS MODAL
+======================================================= -->
+
+<div
+    class="modal"
+    id="settingsModal"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-head">
+
+            <div>
+                <h2>System Settings</h2>
+
+                <div
+                    style="
+                        color:var(--muted);
+                        font-size:11px;
+                        margin-top:4px;
+                    "
+                >
+                    Customize your NEXUS environment.
+                </div>
+            </div>
+
+            <button
+                class="close"
+                data-close="settingsModal"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div class="settings">
+
+            <div class="setting-row">
+
+                <div class="setting-info">
+
+                    <strong>
+                        Light Interface
+                    </strong>
+
+                    <span>
+                        Switch between light and dark UI.
+                    </span>
+
+                </div>
+
+                <label class="switch">
+
+                    <input
+                        type="checkbox"
+                        id="lightSwitch"
+                    >
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+            <div class="setting-row">
+
+                <div class="setting-info">
+
+                    <strong>
+                        Live Animations
+                    </strong>
+
+                    <span>
+                        Enable system animations.
+                    </span>
+
+                </div>
+
+                <label class="switch">
+
+                    <input
+                        type="checkbox"
+                        id="animationSwitch"
+                        checked
+                    >
+
+                    <span class="slider"></span>
+
+                </label>
+
+            </div>
+
+            <div class="setting-row">
+
+                <div class="setting-info">
+
+                    <strong>
+                        Accent Color
+                    </strong>
+
+                    <span>
+                        Select your interface identity.
+                    </span>
+
+                </div>
+
+                <div class="color-picker">
+
+                    <span
+                        class="color active"
+                        data-color="#7c5cff"
+                        style="background:#7c5cff"
+                    ></span>
+
+                    <span
+                        class="color"
+                        data-color="#ff4da6"
+                        style="background:#ff4da6"
+                    ></span>
+
+                    <span
+                        class="color"
+                        data-color="#00d084"
+                        style="background:#00d084"
+                    ></span>
+
+                    <span
+                        class="color"
+                        data-color="#ff8a00"
+                        style="background:#ff8a00"
+                    ></span>
+
+                    <span
+                        class="color"
+                        data-color="#00b8ff"
+                        style="background:#00b8ff"
+                    ></span>
+
+                </div>
+
+            </div>
+
+            <button
+                class="btn"
+                id="resetData"
+                style="justify-content:center;"
+            >
+                Reset Local Data
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =======================================================
+     COMMAND PALETTE
+======================================================= -->
+
+<div
+    class="command"
+    id="commandPalette"
+>
+
+    <div class="command-box">
+
+        <input
+            class="command-search"
+            id="commandSearch"
+            placeholder="Type a command..."
+        >
+
+        <div
+            class="command-list"
+            id="commandList"
+        >
+
+            <button
+                class="command-item"
+                data-command="theme"
+            >
+                🌙
+                Toggle theme
+            </button>
+
+            <button
+                class="command-item"
+                data-command="settings"
+            >
+                ⚙
+                Open settings
+            </button>
+
+            <button
+                class="command-item"
+                data-command="task"
+            >
+                ✓
+                Add task
+            </button>
+
+            <button
+                class="command-item"
+                data-command="matrix"
+            >
+                🟢
+                Activate Matrix mode
+            </button>
+
+            <button
+                class="command-item"
+                data-command="notify"
+            >
+                🔔
+                Create notification
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =======================================================
+     TOAST
+======================================================= -->
+
+<div
+    class="toast-container"
+    id="toastContainer"
+></div>
+
+<!-- =======================================================
+     JAVASCRIPT
+======================================================= -->
+
+<script>
+/* =========================================================
+   GLOBAL STATE
+========================================================= */
+
+const state = {
+    tasks: JSON.parse(
+        localStorage.getItem("nexusTasks") || "[]"
+    ),
+
+    theme:
+        localStorage.getItem("nexusTheme") || "dark",
+
+    accent:
+        localStorage.getItem("nexusAccent") || "#7c5cff",
+
+    playing: false,
+
+    matrix: false
+};
+
+/* =========================================================
+   DOM HELPERS
+========================================================= */
+
+const $ = selector =>
+    document.querySelector(selector);
+
+const $$ = selector =>
+    document.querySelectorAll(selector);
+
+function saveState() {
+    localStorage.setItem(
+        "nexusTasks",
+        JSON.stringify(state.tasks)
+    );
+
+    localStorage.setItem(
+        "nexusTheme",
+        state.theme
+    );
+
+    localStorage.setItem(
+        "nexusAccent",
+        state.accent
+    );
+}
+
+/* =========================================================
+   TOAST SYSTEM
+========================================================= */
+
+function toast(message, icon = "✓") {
+
+    const container =
+        $("#toastContainer");
+
+    const item =
+        document.createElement("div");
+
+    item.className = "toast";
+
+    item.innerHTML = `
+        <span style="
+            font-size:20px;
+        ">${icon}</span>
+
+        <div>
+            <strong>NEXUS</strong>
+
+            <div style="
+                color:var(--muted);
+                font-size:11px;
+                margin-top:3px;
+            ">
+                ${message}
+            </div>
+        </div>
+    `;
+
+    container.appendChild(item);
+
+    setTimeout(() => {
+
+        item.classList.add("hide");
+
+        setTimeout(
+            () => item.remove(),
+            350
+        );
+
+    }, 3500);
+}
+
+/* =========================================================
+   RIPPLE EFFECT
+========================================================= */
+
+document.addEventListener("click", event => {
+
+    const button =
+        event.target.closest(
+            ".btn, .icon-btn, .task-add, .play"
+        );
+
+    if (!button) return;
+
+    const ripple =
+        document.createElement("span");
+
+    ripple.className = "ripple";
+
+    const rect =
+        button.getBoundingClientRect();
+
+    ripple.style.left =
+        `${event.clientX - rect.left}px`;
+
+    ripple.style.top =
+        `${event.clientY - rect.top}px`;
+
+    button.style.position = "relative";
+    button.style.overflow = "hidden";
+
+    button.appendChild(ripple);
+
+    setTimeout(
+        () => ripple.remove(),
+        600
+    );
+});
+
+/* =========================================================
+   CLOCK
+========================================================= */
+
+function updateClock() {
+
+    const now = new Date();
+
+    const time =
+        now.toLocaleTimeString(
+            [],
+            {
+                hour12: false,
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit"
+            }
+        );
+
+    const date =
+        now.toLocaleDateString(
+            [],
+            {
+                weekday: "short",
+                month: "short",
+                day: "numeric",
+                year: "numeric"
+            }
+        );
+
+    $("#clock").textContent = time;
+    $("#date").textContent = date;
+}
+
+updateClock();
+
+setInterval(
+    updateClock,
+    1000
+);
+
+/* =========================================================
+   COUNTERS
+========================================================= */
+
+function animateCounters() {
+
+    $$(".counter").forEach(counter => {
+
+        const target =
+            Number(counter.dataset.target);
+
+        const prefix =
+            counter.dataset.prefix || "";
+
+        let current = 0;
+
+        const duration = 1600;
+
+        const start =
+            performance.now();
+
+        function update(now) {
+
+            const progress =
+                Math.min(
+                    (now - start) / duration,
+                    1
+                );
+
+            const eased =
+                1 -
+                Math.pow(
+                    1 - progress,
+                    3
+                );
+
+            current =
+                Math.floor(
+                    eased * target
+                );
+
+            counter.textContent =
+                prefix +
+                current.toLocaleString();
+
+            if (progress < 1) {
+                requestAnimationFrame(update);
+            }
+
+        }
+
+        requestAnimationFrame(update);
+    });
+}
+
+animateCounters();
+
+/* =========================================================
+   TASK SYSTEM
+========================================================= */
+
+function renderTasks() {
+
+    const list =
+        $("#taskList");
+
+    list.innerHTML = "";
+
+    if (state.tasks.length === 0) {
+
+        list.innerHTML = `
+            <div style="
+                padding:35px 15px;
+                text-align:center;
+                color:var(--muted);
+                font-size:12px;
+            ">
+                No active missions.
+                <br>
+                Add your first task above.
+            </div>
+        `;
+
+    }
+
+    state.tasks.forEach(task => {
+
+        const item =
+            document.createElement("div");
+
+        item.className =
+            `task ${
+                task.completed
+                ? "completed"
+                : ""
+            }`;
+
+        item.innerHTML = `
+
+            <button
+                class="task-check"
+                data-id="${task.id}"
+            >
+                ${
+                    task.completed
+                    ? "✓"
+                    : ""
+                }
+            </button>
+
+            <span class="task-text">
+                ${escapeHTML(task.text)}
+            </span>
+
+            <button
+                class="delete-task"
+                data-delete="${task.id}"
+            >
+                ×
+            </button>
+
+        `;
+
+        list.appendChild(item);
+
+    });
+
+    const active =
+        state.tasks.filter(
+            task => !task.completed
+        ).length;
+
+    $("#taskCount").textContent =
+        `${active} ACTIVE`;
+
+    saveState();
+}
+
+function escapeHTML(value) {
+
+    return value
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+function addTask() {
+
+    const input =
+        $("#taskInput");
+
+    const text =
+        input.value.trim();
+
+    if (!text) {
+
+        toast(
+            "Enter a mission objective first.",
+            "⚠"
+        );
+
+        input.focus();
+
+        return;
+    }
+
+    state.tasks.unshift({
+
+        id:
+            Date.now(),
+
+        text,
+
+        completed:
+            false
+
+    });
+
+    input.value = "";
+
+    renderTasks();
+
+    addActivity(
+        "🎯",
+        `New mission created: ${text}`
+    );
+
+    toast(
+        "Mission successfully added.",
+        "🎯"
+    );
+}
+
+$("#addTask").addEventListener(
+    "click",
+    addTask
+);
+
+$("#taskInput").addEventListener(
+    "keydown",
+    event => {
+
+        if (event.key === "Enter") {
+            addTask();
+        }
+
+    }
+);
+
+$("#taskList").addEventListener(
+    "click",
+    event => {
+
+        const check =
+            event.target.closest(
+                "[data-id]"
+            );
+
+        const remove =
+            event.target.closest(
+                "[data-delete]"
+            );
+
+        if (check) {
+
+            const id =
+                Number(check.dataset.id);
+
+            const task =
+                state.tasks.find(
+                    t => t.id === id
+                );
+
+            if (task) {
+
+                task.completed =
+                    !task.completed;
+
+                renderTasks();
+
+                toast(
+                    task.completed
+                        ? "Mission completed."
+                        : "Mission reopened.",
+                    task.completed
+                        ? "✓"
+                        : "↻"
+                );
+            }
+        }
+
+        if (remove) {
+
+            const id =
+                Number(
+                    remove.dataset.delete
+                );
+
+            state.tasks =
+                state.tasks.filter(
+                    t => t.id !== id
+                );
+
+            renderTasks();
+
+            toast(
+                "Mission removed.",
+                "×"
+            );
+        }
+
+    }
+);
+
+renderTasks();
+
+/* =========================================================
+   ACTIVITY SYSTEM
+========================================================= */
+
+function addActivity(
+    icon,
+    message
+) {
+
+    const list =
+        $("#activityList");
+
+    const item =
+        document.createElement("div");
+
+    item.className =
+        "activity";
+
+    item.innerHTML = `
+
+        <div class="activity-icon">
+            ${icon}
+        </div>
+
+        <div>
+
+            <div class="activity-text">
+                ${escapeHTML(message)}
+            </div>
+
+            <div class="activity-time">
+                Just now
+            </div>
+
+        </div>
+
+    `;
+
+    list.prepend(item);
+
+    while (
+        list.children.length > 6
+    ) {
+        list.lastElementChild.remove();
+    }
+}
+
+/* =========================================================
+   THEME
+========================================================= */
+
+function applyTheme() {
+
+    document.body.classList.toggle(
+        "light",
+        state.theme === "light"
+    );
+
+    $("#lightSwitch").checked =
+        state.theme === "light";
+}
+
+$("#themeToggle").addEventListener(
+    "click",
+    () => {
+
+        state.theme =
+            state.theme === "dark"
+                ? "light"
+                : "dark";
+
+        applyTheme();
+        saveState();
+
+        toast(
+            state.theme === "light"
+                ? "Light interface enabled."
+                : "Dark interface enabled.",
+            "◐"
+        );
+    }
+);
+
+$("#lightSwitch").addEventListener(
+    "change",
+    event => {
+
+        state.theme =
+            event.target.checked
+                ? "light"
+                : "dark";
+
+        applyTheme();
+        saveState();
+
+    }
+);
+
+applyTheme();
+
+/* =========================================================
+   ACCENT COLORS
+========================================================= */
+
+$$(".color").forEach(color => {
+
+    color.addEventListener(
+        "click",
+        () => {
+
+            const value =
+                color.dataset.color;
+
+            state.accent = value;
+
+            document.documentElement
+                .style
+                .setProperty(
+                    "--primary",
+                    value
+                );
+
+            $$(".color").forEach(
+                c =>
+                    c.classList.remove(
+                        "active"
+                    )
+            );
+
+            color.classList.add(
+                "active"
+            );
+
+            saveState();
+
+            toast(
+                "Interface accent updated.",
+                "🎨"
+            );
+        }
+    );
+
+});
+
+document.documentElement
+    .style
+    .setProperty(
+        "--primary",
+        state.accent
+    );
+
+/* =========================================================
+   SETTINGS MODAL
+========================================================= */
+
+function openModal(id) {
+    $(`#${id}`).classList.add("open");
+}
+
+function closeModal(id) {
+    $(`#${id}`).classList.remove("open");
+}
+
+$("#settingsButton").addEventListener(
+    "click",
+    () => openModal("settingsModal")
+);
+
+$$("[data-close]").forEach(button => {
+
+    button.addEventListener(
+        "click",
+        () => closeModal(
+            button.dataset.close
+        )
+    );
+
+});
+
+$("#settingsModal").addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target.id ===
+            "settingsModal"
+        ) {
+            closeModal(
+                "settingsModal"
+            );
+        }
+
+    }
+);
+
+/* =========================================================
+   COMMAND PALETTE
+========================================================= */
+
+function openCommand() {
+
+    $("#commandPalette")
+        .classList
+        .add("open");
+
+    $("#commandSearch").focus();
+}
+
+function closeCommand() {
+
+    $("#commandPalette")
+        .classList
+        .remove("open");
+
+}
+
+$("#commandButton").addEventListener(
+    "click",
+    openCommand
+);
+
+$("#commandHero").addEventListener(
+    "click",
+    openCommand
+);
+
+$("#commandPalette").addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target.id ===
+            "commandPalette"
+        ) {
+            closeCommand();
+        }
+
+    }
+);
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            (event.ctrlKey || event.metaKey) &&
+            event.key.toLowerCase() === "k"
+        ) {
+
+            event.preventDefault();
+
+            openCommand();
+        }
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            closeCommand();
+            closeModal(
+                "settingsModal"
+            );
+
+        }
+
+    }
+);
+
+/* =========================================================
+   COMMAND FILTERING
+========================================================= */
+
+$("#commandSearch").addEventListener(
+    "input",
+    event => {
+
+        const query =
+            event.target.value
+                .toLowerCase();
+
+        $$(".command-item")
+            .forEach(item => {
+
+                item.style.display =
+                    item.textContent
+                        .toLowerCase()
+                        .includes(query)
+                        ? "flex"
+                        : "none";
+
+            });
+
+    }
+);
+
+/* =========================================================
+   COMMAND EXECUTION
+========================================================= */
+
+$$(".command-item").forEach(item => {
+
+    item.addEventListener(
+        "click",
+        () => {
+
+            const command =
+                item.dataset.command;
+
+            switch(command) {
+
+                case "theme":
+
+                    $("#themeToggle")
+                        .click();
+
+                    break;
+
+                case "settings":
+
+                    closeCommand();
+
+                    openModal(
+                        "settingsModal"
+                    );
+
+                    break;
+
+                case "task":
+
+                    closeCommand();
+
+                    $("#taskInput")
+                        .focus();
+
+                    toast(
+                        "Enter a new mission objective.",
+                        "🎯"
+                    );
+
+                    break;
+
+                case "matrix":
+
+                    closeCommand();
+
+                    state.matrix =
+                        !state.matrix;
+
+                    document.body
+                        .classList
+                        .toggle(
+                            "matrix-mode",
+                            state.matrix
+                        );
+
+                    toast(
+                        state.matrix
+                            ? "Matrix mode activated."
+                            : "Matrix mode disabled.",
+                        "🟢"
+                    );
+
+                    break;
+
+                case "notify":
+
+                    closeCommand();
+
+                    toast(
+                        "Command center notification received.",
+                        "🔔"
+                    );
+
+                    break;
+
+            }
+
+        }
+    );
+
+});
+
+/* =========================================================
+   NOTIFICATIONS
+========================================================= */
+
+$("#notificationButton")
+    .addEventListener(
+        "click",
+        () => {
+
+            toast(
+                "You have 3 system events waiting.",
+                "🔔"
+            );
+
+            addActivity(
+                "🔔",
+                "Operator opened notification center."
+            );
+
+        }
+    );
+
+/* =========================================================
+   LAUNCH SYSTEM
+========================================================= */
+
+$("#launchButton")
+    .addEventListener(
+        "click",
+        () => {
+
+            toast(
+                "Initializing NEXUS protocols...",
+                "🚀"
+            );
+
+            addActivity(
+                "🚀",
+                "NEXUS system launch initiated."
+            );
+
+            setTimeout(
+                () => {
+
+                    toast(
+                        "All systems successfully initialized.",
+                        "⚡"
+                    );
+
+                    addActivity(
+                        "⚡",
+                        "All NEXUS systems operational."
+                    );
+
+                },
+                1800
+            );
+
+        }
+    );
+
+/* =========================================================
+   LIVE RESOURCE SIMULATION
+========================================================= */
+
+function randomBetween(
+    min,
+    max
+) {
+    return Math.floor(
+        Math.random() *
+        (max - min + 1)
+    ) + min;
+}
+
+function updateResources() {
+
+    const cpu =
+        randomBetween(35, 88);
+
+    const ram =
+        randomBetween(55, 86);
+
+    const network =
+        randomBetween(60, 96);
+
+    $("#cpuValue").textContent =
+        `${cpu}%`;
+
+    $("#ramValue").textContent =
+        `${ram}%`;
+
+    $("#networkValue").textContent =
+        `${network}%`;
+
+    $("#cpuBar").style.width =
+        `${cpu}%`;
+
+    $("#ramBar").style.width =
+        `${ram}%`;
+
+    $("#networkBar").style.width =
+        `${network}%`;
+
+    $("#systemLoad").textContent =
+        `${Math.floor(
+            (cpu + ram) / 2
+        )}%`;
+}
+
+setInterval(
+    updateResources,
+    2500
+);
+
+/* =========================================================
+   NETWORK GRAPH
+========================================================= */
+
+const networkVisual =
+    $("#networkVisual");
+
+for (
+    let i = 0;
+    i < 55;
+    i++
+) {
+
+    const bar =
+        document.createElement("div");
+
+    bar.className =
+        "network-bar";
+
+    bar.style.height =
+        `${randomBetween(15, 95)}%`;
+
+    networkVisual.appendChild(bar);
+}
+
+setInterval(
+    () => {
+
+        $$(".network-bar")
+            .forEach(bar => {
+
+                bar.style.height =
+                    `${randomBetween(
+                        15,
+                        100
+                    )}%`;
+
+            });
+
+    },
+    800
+);
+
+/* =========================================================
+   CANVAS CHART
+========================================================= */
+
+const chart =
+    $("#performanceChart");
+
+const ctx =
+    chart.getContext("2d");
+
+let chartPoints = [];
+
+function resizeCanvas() {
+
+    const rect =
+        chart.getBoundingClientRect();
+
+    const dpr =
+        window.devicePixelRatio || 1;
+
+    chart.width =
+        rect.width * dpr;
+
+    chart.height =
+        rect.height * dpr;
+
+    ctx.scale(dpr, dpr);
+
+    drawChart();
+}
+
+function generatePoints(count = 32) {
+
+    let value = 60;
+
+    chartPoints = [];
+
+    for (
+        let i = 0;
+        i < count;
+        i++
+    ) {
+
+        value +=
+            randomBetween(-12, 12);
+
+        value =
+            Math.max(
+                20,
+                Math.min(
+                    95,
+                    value
+                )
+            );
+
+        chartPoints.push(value);
+    }
+}
+
+function drawChart() {
+
+    const width =
+        chart.clientWidth;
+
+    const height =
+        chart.clientHeight;
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+    /* Grid */
+
+    ctx.strokeStyle =
+        "rgba(255,255,255,.06)";
+
+    ctx.lineWidth = 1;
+
+    for (
+        let i = 0;
+        i <= 5;
+        i++
+    ) {
+
+        const y =
+            (height / 5) * i;
+
+        ctx.beginPath();
+
+        ctx.moveTo(0, y);
+
+        ctx.lineTo(
+            width,
+            y
+        );
+
+        ctx.stroke();
+    }
+
+    /* Gradient */
+
+    const gradient =
+        ctx.createLinearGradient(
+            0,
+            0,
+            width,
+            0
+        );
+
+    gradient.addColorStop(
+        0,
+        getComputedStyle(
+            document.documentElement
+        ).getPropertyValue(
+            "--primary"
+        )
+    );
+
+    gradient.addColorStop(
+        1,
+        "#00e5ff"
+    );
+
+    /* Area */
+
+    const step =
+        width /
+        (chartPoints.length - 1);
+
+    ctx.beginPath();
+
+    chartPoints.forEach(
+        (value, index) => {
+
+            const x =
+                index * step;
+
+            const y =
+                height -
+                (value / 100) *
+                height;
+
+            if (index === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+
+        }
+    );
+
+    ctx.lineTo(
+        width,
+        height
+    );
+
+    ctx.lineTo(
+        0,
+        height
+    );
+
+    ctx.closePath();
+
+    const area =
+        ctx.createLinearGradient(
+            0,
+            0,
+            0,
+            height
+        );
+
+    area.addColorStop(
+        0,
+        "rgba(124,92,255,.30)"
+    );
+
+    area.addColorStop(
+        1,
+        "rgba(124,92,255,0)"
+    );
+
+    ctx.fillStyle = area;
+
+    ctx.fill();
+
+    /* Line */
+
+    ctx.beginPath();
+
+    chartPoints.forEach(
+        (value, index) => {
+
+            const x =
+                index * step;
+
+            const y =
+                height -
+                (value / 100) *
+                height;
+
+            if (index === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+
+        }
+    );
+
+    ctx.strokeStyle =
+        gradient;
+
+    ctx.lineWidth = 3;
+
+    ctx.shadowBlur = 15;
+    ctx.shadowColor =
+        "#00e5ff";
+
+    ctx.stroke();
+
+    ctx.shadowBlur = 0;
+
+    /* Points */
+
+    chartPoints.forEach(
+        (value, index) => {
+
+            if (
+                index %
+                Math.max(
+                    1,
+                    Math.floor(
+                        chartPoints.length / 8
+                    )
+                ) !== 0
+            ) return;
+
+            const x =
+                index * step;
+
+            const y =
+                height -
+                (value / 100) *
+                height;
+
+            ctx.beginPath();
+
+            ctx.arc(
+                x,
+                y,
+                4,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fillStyle =
+                "#00e5ff";
+
+            ctx.fill();
+
+        }
+    );
+}
+
+generatePoints();
+
+window.addEventListener(
+    "resize",
+    resizeCanvas
+);
+
+setTimeout(
+    resizeCanvas,
+    100
+);
+
+$("#chartRange").addEventListener(
+    "change",
+    event => {
+
+        const count =
+            event.target.value === "7 Days"
+                ? 32
+                : event.target.value === "30 Days"
+                    ? 65
+                    : 110;
+
+        generatePoints(count);
+
+        resizeCanvas();
+
+        toast(
+            `Chart range changed to ${event.target.value}.`,
+            "📊"
+        );
+
+    }
+);
+
+/* =========================================================
+   MUSIC PLAYER
+========================================================= */
+
+let musicProgress = 32;
+
+$("#playButton")
+    .addEventListener(
+        "click",
+        () => {
+
+            state.playing =
+                !state.playing;
+
+            $("#playButton")
+                .textContent =
+                state.playing
+                    ? "❚❚"
+                    : "▶";
+
+            toast(
+                state.playing
+                    ? "Neural audio started."
+                    : "Neural audio paused.",
+                "♪"
+            );
+
+        }
+    );
+
+setInterval(
+    () => {
+
+        if (!state.playing) return;
+
+        musicProgress += .2;
+
+        if (musicProgress > 100) {
+            musicProgress = 0;
+        }
+
+        $("#musicProgress")
+            .style.width =
+            `${musicProgress}%`;
+
+    },
+    1000
+);
+
+$("#prevSong")
+    .addEventListener(
+        "click",
+        () => {
+
+            musicProgress = 0;
+
+            toast(
+                "Previous track selected.",
+                "◀"
+            );
+
+        }
+    );
+
+$("#nextSong")
+    .addEventListener(
+        "click",
+        () => {
+
+            musicProgress = 0;
+
+            toast(
+                "Next track selected.",
+                "▶"
+            );
+
+        }
+    );
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+$("#searchInput")
+    .addEventListener(
+        "input",
+        event => {
+
+            const query =
+                event.target.value
+                    .toLowerCase()
+                    .trim();
+
+            if (!query) {
+                $$(".card, .hero")
+                    .forEach(
+                        element =>
+                            element.style.display =
+                                ""
+                    );
+
+                return;
+            }
+
+            let found = false;
+
+            $$(".card, .hero")
+                .forEach(
+                    element => {
+
+                        const match =
+                            element.textContent
+                                .toLowerCase()
+                                .includes(query);
+
+                        element.style.display =
+                            match
+                                ? ""
+                                : "none";
+
+                        if (match) {
+                            found = true;
+                        }
+
+                    }
+                );
+
+            if (!found) {
+
+                toast(
+                    "No matching interface element found.",
+                    "⌕"
+                );
+
+            }
+
+        }
+    );
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+$$(".nav-item[data-section]")
+    .forEach(item => {
+
+        item.addEventListener(
+            "click",
+            () => {
+
+                $$(".nav-item")
+                    .forEach(
+                        n =>
+                            n.classList
+                                .remove("active")
+                    );
+
+                item.classList.add(
+                    "active"
+                );
+
+                const section =
+                    item.dataset.section;
+
+                toast(
+                    `${section.toUpperCase()} module selected.`,
+                    "◈"
+                );
+
+                if (
+                    section ===
+                    "analytics"
+                ) {
+
+                    $(".dashboard-grid")
+                        .scrollIntoView({
+                            behavior: "smooth"
+                        });
+
+                }
+
+                if (
+                    section ===
+                    "projects"
+                ) {
+
+                    $("#taskList")
+                        .scrollIntoView({
+                            behavior: "smooth"
+                        });
+
+                }
+
+                if (
+                    section ===
+                    "messages"
+                ) {
+
+                    $("#activityList")
+                        .scrollIntoView({
+                            behavior: "smooth"
+                        });
+
+                }
+
+            }
+        );
+
+    });
+
+/* =========================================================
+   MOBILE SIDEBAR
+========================================================= */
+
+$("#mobileMenu")
+    .addEventListener(
+        "click",
+        () => {
+
+            $("#sidebar")
+                .classList
+                .toggle(
+                    "mobile-open"
+                );
+
+        }
+    );
+
+/* =========================================================
+   ANIMATION SWITCH
+========================================================= */
+
+$("#animationSwitch")
+    .addEventListener(
+        "change",
+        event => {
+
+            document.body.style
+                .setProperty(
+                    "--transition",
+                    event.target.checked
+                        ? ".3s cubic-bezier(.2,.8,.2,1)"
+                        : "0s"
+                );
+
+            toast(
+                event.target.checked
+                    ? "Animations enabled."
+                    : "Animations disabled.",
+                "✨"
+            );
+
+        }
+    );
+
+/* =========================================================
+   RESET
+========================================================= */
+
+$("#resetData")
+    .addEventListener(
+        "click",
+        () => {
+
+            const confirmed =
+                confirm(
+                    "Reset all NEXUS local data?"
+                );
+
+            if (!confirmed) return;
+
+            localStorage.clear();
+
+            state.tasks = [];
+
+            state.theme = "dark";
+
+            state.accent =
+                "#7c5cff";
+
+            document.documentElement
+                .style
+                .setProperty(
+                    "--primary",
+                    state.accent
+                );
+
+            applyTheme();
+
+            renderTasks();
+
+            toast(
+                "Local system data reset.",
+                "↻"
+            );
+
+        }
+    );
+
+/* =========================================================
+   PARTICLE ENGINE
+========================================================= */
+
+const particleCanvas =
+    $("#particleCanvas");
+
+const particleContext =
+    particleCanvas.getContext("2d");
+
+let particles = [];
+
+function resizeParticles() {
+
+    particleCanvas.width =
+        window.innerWidth;
+
+    particleCanvas.height =
+        window.innerHeight;
+}
+
+class Particle {
+
+    constructor() {
+
+        this.x =
+            Math.random() *
+            particleCanvas.width;
+
+        this.y =
+            Math.random() *
+            particleCanvas.height;
+
+        this.vx =
+            (Math.random() - .5)
+            * .35;
+
+        this.vy =
+            (Math.random() - .5)
+            * .35;
+
+        this.size =
+            Math.random() * 2 + .4;
+
+        this.alpha =
+            Math.random() * .7 + .15;
+    }
+
+    update() {
+
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (
+            this.x < 0 ||
+            this.x >
+            particleCanvas.width
+        ) {
+            this.vx *= -1;
+        }
+
+        if (
+            this.y < 0 ||
+            this.y >
+            particleCanvas.height
+        ) {
+            this.vy *= -1;
+        }
+
+    }
+
+    draw() {
+
+        particleContext.beginPath();
+
+        particleContext.arc(
+            this.x,
+            this.y,
+            this.size,
+            0,
+            Math.PI * 2
+        );
+
+        particleContext.fillStyle =
+            `rgba(124,92,255,${this.alpha})`;
+
+        particleContext.fill();
+
+    }
+}
+
+function createParticles() {
+
+    particles = [];
+
+    const amount =
+        Math.min(
+            140,
+            Math.floor(
+                window.innerWidth /
+                10
+            )
+        );
+
+    for (
+        let i = 0;
+        i < amount;
+        i++
+    ) {
+
+        particles.push(
+            new Particle()
+        );
+
+    }
+}
+
+function connectParticles() {
+
+    for (
+        let i = 0;
+        i < particles.length;
+        i++
+    ) {
+
+        for (
+            let j = i + 1;
+            j < particles.length;
+            j++
+        ) {
+
+            const a =
+                particles[i];
+
+            const b =
+                particles[j];
+
+            const dx =
+                a.x - b.x;
+
+            const dy =
+                a.y - b.y;
+
+            const distance =
+                Math.sqrt(
+                    dx * dx +
+                    dy * dy
+                );
+
+            if (distance < 115) {
+
+                particleContext.beginPath();
+
+                particleContext.moveTo(
+                    a.x,
+                    a.y
+                );
+
+                particleContext.lineTo(
+                    b.x,
+                    b.y
+                );
+
+                particleContext.strokeStyle =
+                    `rgba(
+                        124,
+                        92,
+                        255,
+                        ${(
+                            1 -
+                            distance /
+                            115
+                        ) * .15}
+                    )`;
+
+                particleContext.lineWidth =
+                    .5;
+
+                particleContext.stroke();
+
+            }
+
+        }
+
+    }
+}
+
+function particleAnimation() {
+
+    particleContext.clearRect(
+        0,
+        0,
+        particleCanvas.width,
+        particleCanvas.height
+    );
+
+    particles.forEach(
+        particle => {
+
+            particle.update();
+            particle.draw();
+
+        }
+    );
+
+    connectParticles();
+
+    requestAnimationFrame(
+        particleAnimation
+    );
+}
+
+resizeParticles();
+
+createParticles();
+
+particleAnimation();
+
+window.addEventListener(
+    "resize",
+    () => {
+
+        resizeParticles();
+        createParticles();
+
+    }
+);
+
+/* =========================================================
+   MOUSE INTERACTION WITH PARTICLES
+========================================================= */
+
+let mouse = {
+    x: null,
+    y: null
+};
+
+window.addEventListener(
+    "mousemove",
+    event => {
+
+        mouse.x =
+            event.clientX;
+
+        mouse.y =
+            event.clientY;
+
+        particles.forEach(
+            particle => {
+
+                const dx =
+                    particle.x -
+                    mouse.x;
+
+                const dy =
+                    particle.y -
+                    mouse.y;
+
+                const distance =
+                    Math.sqrt(
+                        dx * dx +
+                        dy * dy
+                    );
+
+                if (
+                    distance < 90
+                ) {
+
+                    particle.x +=
+                        dx /
+                        distance *
+                        1.2;
+
+                    particle.y +=
+                        dy /
+                        distance *
+                        1.2;
+
+                }
+
+            }
+        );
+
+    }
+);
+
+/* =========================================================
+   KONAMI / SECRET MODE
+========================================================= */
+
+const secretCode = [
+    "ArrowUp",
+    "ArrowUp",
+    "ArrowDown",
+    "ArrowDown",
+    "ArrowLeft",
+    "ArrowRight",
+    "ArrowLeft",
+    "ArrowRight",
+    "b",
+    "a"
+];
+
+let secretIndex = 0;
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key ===
+            secretCode[secretIndex]
+        ) {
+
+            secretIndex++;
+
+            if (
+                secretIndex ===
+                secretCode.length
+            ) {
+
+                state.matrix =
+                    !state.matrix;
+
+                document.body
+                    .classList
+                    .toggle(
+                        "matrix-mode",
+                        state.matrix
+                    );
+
+                toast(
+                    "SECRET PROTOCOL ACTIVATED.",
+                    "☢"
+                );
+
+                secretIndex = 0;
+            }
+
+        } else {
+
+            secretIndex = 0;
+
+        }
+
+    }
+);
+
+/* =========================================================
+   RANDOM SYSTEM EVENTS
+========================================================= */
+
+const events = [
+
+    ["⚡", "Background optimization completed."],
+    ["🔐", "Security scan completed."],
+    ["🌐", "Network route optimized."],
+    ["🧠", "Neural cache refreshed."],
+    ["💾", "Database synchronization complete."],
+    ["📡", "Signal integrity verified."],
+    ["🛰️", "Satellite uplink stabilized."],
+    ["🔧", "System maintenance task completed."]
+];
+
+setInterval(
+    () => {
+
+        if (
+            Math.random() < .7
+        ) {
+
+            const event =
+                events[
+                    Math.floor(
+                        Math.random() *
+                        events.length
+                    )
+                ];
+
+            addActivity(
+                event[0],
+                event[1]
+            );
+
+        }
+
+    },
+    7000
+);
+
+/* =========================================================
+   INITIAL BOOT SEQUENCE
+========================================================= */
+
+window.addEventListener(
+    "load",
+    () => {
+
+        setTimeout(
+            () => {
+
+                toast(
+                    "NEXUS interface initialized.",
+                    "🚀"
+                );
+
+            },
+            700
+        );
+
+        setTimeout(
+            () => {
+
+                toast(
+                    "All modules synchronized.",
+                    "✓"
+                );
+
+            },
+            1600
+        );
+
+    }
+);
+
+/* =========================================================
+   CONSOLE EASTER EGG
+========================================================= */
+
+console.log(`
+╔══════════════════════════════════════╗
+║        NEXUS COMMAND CENTER          ║
+║                                      ║
+║  System:      ONLINE                  ║
+║  Interface:   NEXUS v9.7              ║
+║  Security:    ACTIVE                  ║
+║  Operator:    AUTHORIZED              ║
+║                                      ║
+║  Hint: Try the Konami Code ;)         ║
+╚══════════════════════════════════════╝
+`);
+
+/* =========================================================
+   FINAL INITIALIZATION
+========================================================= */
+
+updateResources();
+renderTasks();
+
+</script>
+
+</body>
+</html>  
