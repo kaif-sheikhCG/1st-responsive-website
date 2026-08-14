@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crux Climbing Co. — Indoor Bouldering &amp; Climbing Gym</title>
+<meta name="description" content="Crux is an indoor bouldering and climbing gym with routes reset weekly, beginner classes, youth programs and coaching for every level.">
+<meta name="theme-color" content="#1E1E1C">
+
+<meta property="og:title" content="Crux Climbing Co.">
+<meta property="og:description" content="Find your crux. Send it anyway.">
+<meta property="og:type" content="website">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231E1E1C'/%3E%3Cpath d='M6 46 L22 18 L30 30 L38 14 L58 46 Z' fill='%23FFC53D'/%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700;800;900&amp;family=Manrope:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+
+<style>
+/* ===================================================================
+   CRUX CLIMBING CO. — STYLESHEET
+   1. Reset & base           9.  Header & nav          17. Pricing
+   2. Design tokens          10. Hero                  18. Team / coaches
+   3. Typography             11. Route ticker           19. Schedule
+   4. Layout utilities       12. About / the gym        20. Journal
+   5. Buttons & forms        13. Stats                  21. FAQ
+   6. Accessibility          14. Services               22. CTA banner
+   7. Preloader              15. Process                23. Contact
+   8. Cursor / scroll bar    16. Routes (portfolio)     24. Footer, misc, media
+   =================================================================== */
+
+/* ---------- 1. Reset & base ---------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button, input, textarea, select { font: inherit; color: inherit; background: none; border: none; }
+ul { list-style: none; }
+button { cursor: pointer; }
+
+/* ---------- 2. Design tokens ---------- */
+:root {
+  --yellow: #FFC53D;
+  --blue: #2E86EB;
+  --red: #E4432E;
+  --purple: #6B3FA0;
+
+  --chalk: #EEF0EE;
+  --chalk-alt: #E2E5E0;
+  --surface: #F8F9F7;
+  --rock: #1E1E1C;
+  --rock-soft: #57574F;
+  --border: rgba(30, 30, 28, 0.12);
+  --shadow-color: 30, 30, 28;
+
+  --font-display: 'Unbounded', sans-serif;
+  --font-body: 'Manrope', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 16px;
+  --radius-lg: 28px;
+  --container: 1260px;
+  --ease: cubic-bezier(0.65, 0, 0.35, 1);
+  --speed: 0.35s;
+}
+
+html[data-theme="dark"] {
+  --chalk: #17181A;
+  --chalk-alt: #1F2123;
+  --surface: #232527;
+  --rock: #F1F2EE;
+  --rock-soft: #B7B9B4;
+  --border: rgba(241, 242, 238, 0.14);
+  --shadow-color: 0, 0, 0;
+}
+
+body { background: var(--chalk); color: var(--rock); font-family: var(--font-body); line-height: 1.6; overflow-x: hidden; transition: background var(--speed) var(--ease), color var(--speed) var(--ease); }
+
+/* ---------- 3. Typography ---------- */
+h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 800; line-height: 1.02; letter-spacing: -0.01em; text-wrap: balance; }
+h1 { font-size: clamp(2.5rem, 7.5vw, 5.75rem); font-weight: 800; }
+h2 { font-size: clamp(2.1rem, 5vw, 3.4rem); }
+h3 { font-size: clamp(1.25rem, 2.4vw, 1.55rem); font-weight: 700; }
+h4 { font-size: 1.05rem; font-weight: 700; }
+p { color: var(--rock-soft); }
+.lede { font-size: clamp(1.05rem, 1.6vw, 1.2rem); max-width: 46ch; }
+
+.eyebrow { display: inline-flex; align-items: center; gap: 0.6em; font-family: var(--font-mono); font-size: 0.76rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--rock-soft); margin-bottom: 1.1rem; }
+.eyebrow::before { content: ""; width: 8px; height: 8px; border-radius: 2px; background: var(--yellow); flex-shrink: 0; transform: rotate(45deg); }
+
+.section-head { max-width: 640px; margin-bottom: 3.5rem; }
+.section-head.center { margin-left: auto; margin-right: auto; text-align: center; }
+.section-head p { margin-top: 1rem; }
+
+/* ---------- 4. Layout utilities ---------- */
+.container { width: 100%; max-width: var(--container); margin: 0 auto; padding: 0 clamp(1.25rem, 4vw, 2.5rem); }
+section { position: relative; padding: clamp(4.5rem, 9vw, 8rem) 0; }
+.section-alt { background: var(--chalk-alt); }
+.grid { display: grid; gap: 1.75rem; }
+.stack { display: flex; flex-direction: column; }
+
+/* grade badge — a structural device borrowed from the gym's real tape-color grading key */
+.grade-badge { display: inline-flex; align-items: center; gap: 0.45rem; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.35rem 0.75rem; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); }
+.grade-badge .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.grade-yellow .dot { background: var(--yellow); } .grade-blue .dot { background: var(--blue); } .grade-red .dot { background: var(--red); } .grade-purple .dot { background: var(--purple); }
+
+/* ---------- 5. Buttons & forms ---------- */
+.btn { display: inline-flex; align-items: center; gap: 0.6rem; font-family: var(--font-body); font-weight: 700; font-size: 0.95rem; padding: 0.95rem 1.65rem; border-radius: var(--radius-sm); border: 1.5px solid transparent; transition: transform var(--speed) var(--ease), box-shadow var(--speed) var(--ease), background var(--speed) var(--ease), color var(--speed) var(--ease), border-color var(--speed) var(--ease); white-space: nowrap; }
+.btn svg { width: 18px; height: 18px; }
+.btn-primary { background: var(--yellow); color: var(--rock); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 24px -10px rgba(255, 197, 61, 0.6); }
+.btn-outline { border-color: var(--border); color: var(--rock); }
+.btn-outline:hover { border-color: var(--rock); transform: translateY(-2px); }
+.btn-sm { padding: 0.65rem 1.15rem; font-size: 0.85rem; }
+.btn-block { width: 100%; justify-content: center; }
+.btn:active { transform: translateY(0); }
+
+.field { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem; }
+.field label { font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--rock-soft); }
+.field input, .field select, .field textarea { border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 0.85rem 1rem; background: var(--surface); color: var(--rock); transition: border-color var(--speed) var(--ease); font-size: 0.98rem; }
+.field textarea { resize: vertical; min-height: 120px; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--blue); }
+.field .error-msg { font-size: 0.78rem; color: var(--red); min-height: 1em; font-family: var(--font-mono); }
+.field.has-error input, .field.has-error select, .field.has-error textarea { border-color: var(--red); }
+
+/* ---------- 6. Accessibility ---------- */
+.skip-link { position: absolute; left: 1rem; top: -60px; background: var(--rock); color: var(--chalk); padding: 0.85rem 1.25rem; border-radius: var(--radius-sm); z-index: 9999; transition: top var(--speed) var(--ease); font-family: var(--font-mono); font-size: 0.85rem; }
+.skip-link:focus { top: 1rem; }
+:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; border-radius: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+/* ---------- 7. Preloader ---------- */
+.preloader { position: fixed; inset: 0; background: var(--rock); z-index: 10000; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1.25rem; transition: opacity 0.6s var(--ease), visibility 0.6s var(--ease); }
+.preloader.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.preloader-mark svg { width: 46px; height: 40px; animation: climb-bounce 1.1s var(--ease) infinite; }
+.preloader-mark path { fill: var(--yellow); }
+@keyframes climb-bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.preloader-bar { width: 180px; height: 3px; background: rgba(238,240,238,0.15); border-radius: 3px; overflow: hidden; }
+.preloader-bar span { display: block; height: 100%; width: 0%; background: var(--chalk); animation: load-bar 1.3s var(--ease) forwards; }
+@keyframes load-bar { to { width: 100%; } }
+.preloader-label { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; color: var(--chalk); opacity: 0.6; text-transform: uppercase; }
+
+/* ---------- 8. Cursor / scroll bar ---------- */
+.cursor-dot, .cursor-outline { position: fixed; top: 0; left: 0; border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%, -50%); }
+.cursor-dot { width: 7px; height: 7px; background: var(--yellow); }
+.cursor-outline { width: 34px; height: 34px; border: 1.5px solid var(--rock); opacity: 0.5; transition: width var(--speed) var(--ease), height var(--speed) var(--ease), border-color var(--speed) var(--ease); }
+.cursor-outline.is-active { width: 54px; height: 54px; border-color: var(--yellow); }
+@media (hover: none), (pointer: coarse) { .cursor-dot, .cursor-outline { display: none; } }
+.scroll-progress { position: fixed; top: 0; left: 0; height: 3px; width: 0%; background: linear-gradient(90deg, var(--yellow), var(--red), var(--purple)); z-index: 9997; transition: width 0.1s linear; }
+.icon { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.icon-fill { fill: currentColor; stroke: none; }
+
+/* ---------- 9. Header & nav ---------- */
+.header { position: fixed; top: 0; left: 0; right: 0; z-index: 900; padding: 1.35rem 0; transition: padding var(--speed) var(--ease), background var(--speed) var(--ease), box-shadow var(--speed) var(--ease); }
+.header.is-scrolled { padding: 0.85rem 0; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: 0 1px 0 var(--border); }
+html[data-theme="light"] .header.is-scrolled { background: rgba(238, 240, 238, 0.88); }
+html[data-theme="dark"] .header.is-scrolled { background: rgba(23, 24, 26, 0.88); }
+
+.header-inner { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
+.logo { display: flex; align-items: center; gap: 0.65rem; font-family: var(--font-display); font-weight: 800; font-size: 1.25rem; }
+.logo-mark { width: 30px; height: 24px; }
+.logo-mark path { fill: var(--rock); }
+
+.nav-list { display: flex; align-items: center; gap: 2.1rem; }
+.nav-link { font-size: 0.95rem; font-weight: 600; position: relative; padding: 0.3rem 0; }
+.nav-link::after { content: ""; position: absolute; left: 0; bottom: -2px; width: 0; height: 2px; background: var(--yellow); transition: width var(--speed) var(--ease); }
+.nav-link:hover::after, .nav-link.is-active::after { width: 100%; }
+.nav-link.is-active { font-weight: 800; }
+
+.header-actions { display: flex; align-items: center; gap: 0.9rem; }
+.theme-toggle { width: 42px; height: 42px; border-radius: 50%; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; transition: border-color var(--speed) var(--ease), transform var(--speed) var(--ease); flex-shrink: 0; }
+.theme-toggle:hover { border-color: var(--rock); transform: rotate(-14deg); }
+.theme-toggle .icon-moon { display: none; }
+html[data-theme="dark"] .theme-toggle .icon-sun { display: none; }
+html[data-theme="dark"] .theme-toggle .icon-moon { display: block; }
+
+.hamburger { display: none; flex-direction: column; justify-content: center; gap: 5px; width: 42px; height: 42px; border-radius: 50%; border: 1.5px solid var(--border); flex-shrink: 0; }
+.hamburger span { display: block; width: 18px; height: 2px; background: var(--rock); margin: 0 auto; transition: transform var(--speed) var(--ease), opacity var(--speed) var(--ease); }
+.hamburger.is-open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.is-open span:nth-child(2) { opacity: 0; }
+.hamburger.is-open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ---------- 10. Hero ---------- */
+.hero { padding-top: clamp(8rem, 16vw, 11rem); overflow: hidden; }
+.hero-inner { max-width: 880px; position: relative; z-index: 2; }
+.hero-topo { position: absolute; top: -6%; right: -8%; width: 620px; max-width: 55vw; opacity: 0.55; z-index: 1; color: var(--rock-soft); }
+html[data-theme="dark"] .hero-topo { opacity: 0.35; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 2.25rem; }
+.hero-spec-strip { display: flex; flex-wrap: wrap; gap: 0.5rem 1.6rem; margin-top: 2.75rem; font-family: var(--font-mono); font-size: 0.82rem; color: var(--rock-soft); }
+.hero-spec-strip span { display: flex; align-items: center; gap: 0.55rem; }
+.hero-spec-strip span::before { content: "\2022"; color: var(--yellow); font-weight: 700; }
+.hero-scrolldown { display: flex; align-items: center; gap: 0.6rem; margin-top: 4.5rem; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--rock-soft); }
+.hero-scrolldown .icon { animation: bob 1.6s ease-in-out infinite; }
+@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
+/* ---------- 11. Route ticker ---------- */
+.ticker-section { padding: 2.75rem 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); overflow: hidden; background: var(--rock); }
+.ticker-label { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--chalk); opacity: 0.55; text-align: center; margin-bottom: 1.4rem; }
+.ticker-track { display: flex; width: max-content; animation: ticker-scroll 30s linear infinite; }
+.ticker-track .ticker-item { display: flex; align-items: center; gap: 0.85rem; padding: 0 2.25rem; white-space: nowrap; border-right: 1px solid rgba(238,240,238,0.16); }
+.ticker-item .name { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; color: var(--chalk); }
+.ticker-item .grade-badge { background: rgba(238,240,238,0.08); border-color: rgba(238,240,238,0.18); color: var(--chalk); }
+@keyframes ticker-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ---------- 12. About ---------- */
+.about-grid { grid-template-columns: 1fr 1.05fr; align-items: center; gap: 4rem; }
+.about-checklist { margin-top: 2rem; display: flex; flex-direction: column; gap: 0.9rem; }
+.about-checklist li { display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.98rem; }
+.about-checklist .icon { color: var(--yellow); margin-top: 2px; }
+.legend-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.75rem; }
+.legend-panel-label { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--rock-soft); margin-bottom: 1.4rem; display: block; }
+.legend-row { display: flex; align-items: center; justify-content: space-between; padding: 1.05rem 0; border-top: 1px solid var(--border); }
+.legend-row:first-of-type { border-top: none; }
+.legend-row .tape { display: flex; align-items: center; gap: 0.85rem; font-weight: 700; }
+.legend-row .swatch { width: 14px; height: 34px; border-radius: 3px; }
+.legend-row .desc { font-size: 0.85rem; color: var(--rock-soft); font-family: var(--font-mono); text-align: right; }
+
+/* ---------- 13. Stats ---------- */
+.stats-grid { grid-template-columns: repeat(4, 1fr); text-align: center; }
+.stat-num { font-family: var(--font-display); font-weight: 900; font-size: clamp(2.4rem, 5vw, 3.6rem); color: var(--rock); line-height: 1; }
+.stat-label { font-family: var(--font-mono); font-size: 0.76rem; color: var(--rock-soft); margin-top: 0.6rem; }
+
+/* ---------- 14. Services ---------- */
+.services-grid { grid-template-columns: repeat(3, 1fr); }
+.service-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 2.25rem; transition: transform var(--speed) var(--ease), box-shadow var(--speed) var(--ease); }
+.service-card:hover { transform: translateY(-6px); box-shadow: 0 16px 32px -18px rgba(var(--shadow-color), 0.3); }
+.service-icon { width: 52px; height: 52px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; background: var(--chalk-alt); color: var(--rock); }
+.service-card h3 { margin-bottom: 0.6rem; }
+.service-card p { font-size: 0.95rem; }
+.service-link { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 1.25rem; font-weight: 700; font-size: 0.9rem; }
+.service-link .icon { width: 15px; height: 15px; transition: transform var(--speed) var(--ease); }
+.service-card:hover .service-link .icon { transform: translate(3px, -3px); }
+
+/* ---------- 15. Process ---------- */
+.process-list { display: flex; flex-direction: column; }
+.process-item { display: grid; grid-template-columns: 130px 1fr; gap: 2rem; padding: 2.25rem 0; border-top: 1px solid var(--border); align-items: start; }
+.process-item:last-child { border-bottom: 1px solid var(--border); }
+.process-num { font-family: var(--font-mono); font-size: 0.92rem; color: var(--rock-soft); }
+.process-item .icon-wrap { width: 42px; height: 42px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; margin-bottom: 0.9rem; color: var(--yellow); }
+.process-item h3 { margin-bottom: 0.5rem; }
+.process-item p { max-width: 56ch; }
+
+/* ---------- 16. Routes (portfolio) ---------- */
+.route-filters { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 2.75rem; }
+.filter-btn { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.04em; text-transform: uppercase; padding: 0.6rem 1.15rem; border-radius: 999px; border: 1.5px solid var(--border); transition: all var(--speed) var(--ease); display: inline-flex; align-items: center; gap: 0.5rem; }
+.filter-btn:hover { border-color: var(--rock); }
+.filter-btn.is-active { background: var(--rock); color: var(--chalk); border-color: var(--rock); }
+.filter-btn .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+.route-grid { grid-template-columns: repeat(4, 1fr); }
+.route-card { cursor: pointer; }
+.route-thumb { position: relative; aspect-ratio: 4/5; border-radius: var(--radius-md); overflow: hidden; margin-bottom: 1.1rem; }
+.route-thumb .base { position: absolute; inset: 0; }
+.route-thumb .hold { position: absolute; border-radius: 40% 60% 55% 45% / 50% 45% 55% 50%; background: rgba(255,255,255,0.9); transition: transform 0.5s var(--ease); }
+.route-card:hover .hold { transform: scale(1.12); }
+.route-card h4 { margin-bottom: 0.3rem; }
+.route-meta { display: flex; align-items: center; justify-content: space-between; }
+.route-setter { font-family: var(--font-mono); font-size: 0.75rem; color: var(--rock-soft); }
+.route-card[data-hidden="true"] { display: none; }
+
+/* ---------- 17. Pricing ---------- */
+.pricing-toggle-wrap { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 3.5rem; font-family: var(--font-mono); font-size: 0.85rem; }
+.pricing-toggle { position: relative; width: 58px; height: 30px; border-radius: 999px; background: var(--rock); flex-shrink: 0; }
+.pricing-toggle .knob { position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: var(--chalk); transition: transform var(--speed) var(--ease); }
+.pricing-toggle[aria-checked="true"] .knob { transform: translateX(28px); background: var(--yellow); }
+.pricing-grid { grid-template-columns: repeat(3, 1fr); align-items: stretch; }
+.price-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 2.5rem; display: flex; flex-direction: column; position: relative; }
+.price-card.is-featured { border-color: var(--rock); background: var(--rock); color: var(--chalk); }
+.price-card.is-featured .price-desc, .price-card.is-featured .price-feature { color: rgba(238,240,238,0.72); }
+.price-badge { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: var(--yellow); color: var(--rock); font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.4rem 0.9rem; border-radius: 999px; font-weight: 700; }
+.price-name { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--rock-soft); margin-bottom: 0.9rem; }
+.price-card.is-featured .price-name { color: rgba(238,240,238,0.72); }
+.price-desc { font-size: 0.92rem; margin-bottom: 1.5rem; }
+.price-amount { display: flex; align-items: baseline; gap: 0.35rem; margin-bottom: 1.75rem; }
+.price-amount .num { font-family: var(--font-display); font-weight: 800; font-size: 2.6rem; }
+.price-amount .unit { font-family: var(--font-mono); font-size: 0.85rem; opacity: 0.65; }
+.price-features { display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: 2rem; flex: 1; }
+.price-feature { display: flex; align-items: flex-start; gap: 0.65rem; font-size: 0.92rem; }
+.price-feature .icon { color: var(--yellow); flex-shrink: 0; margin-top: 2px; width: 17px; height: 17px; }
+.price-card.is-featured .btn-outline { border-color: rgba(238,240,238,0.3); }
+
+/* ---------- 18. Team ---------- */
+.team-grid { grid-template-columns: repeat(4, 1fr); }
+.team-avatar { aspect-ratio: 1; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 800; font-size: 2.6rem; color: #fff; margin-bottom: 1.25rem; }
+.team-role { font-family: var(--font-mono); font-size: 0.75rem; color: var(--rock-soft); text-transform: uppercase; letter-spacing: 0.04em; margin: 0.25rem 0 0.75rem; }
+.team-bio { font-size: 0.9rem; }
+.team-social { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--border); margin-top: 1rem; font-family: var(--font-mono); font-size: 0.68rem; font-weight: 700; transition: all var(--speed) var(--ease); }
+.team-social:hover { border-color: var(--rock); background: var(--rock); color: var(--chalk); }
+
+/* ---------- 19. Schedule ---------- */
+.schedule-tabs { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 2.5rem; }
+.schedule-tab { font-family: var(--font-mono); font-size: 0.8rem; font-weight: 600; padding: 0.75rem 1.1rem; border-radius: var(--radius-sm); border: 1.5px solid var(--border); }
+.schedule-tab.is-active { background: var(--rock); color: var(--chalk); border-color: var(--rock); }
+.schedule-panel { display: none; }
+.schedule-panel.is-active { display: block; animation: fade-up 0.4s var(--ease); }
+@keyframes fade-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.schedule-row { display: grid; grid-template-columns: 130px 1fr auto; align-items: center; gap: 1.5rem; padding: 1.35rem 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 0.85rem; }
+.schedule-time { font-family: var(--font-mono); font-size: 0.85rem; color: var(--rock-soft); }
+.schedule-row h4 { margin-bottom: 0.15rem; }
+.schedule-row p { font-size: 0.85rem; margin: 0; }
+
+/* ---------- 20. Journal ---------- */
+.journal-grid { grid-template-columns: repeat(3, 1fr); }
+.journal-card { display: flex; flex-direction: column; }
+.journal-thumb { aspect-ratio: 16/10; border-radius: var(--radius-md); margin-bottom: 1.25rem; position: relative; overflow: hidden; display: flex; align-items: flex-end; padding: 1.25rem; }
+.journal-tag { font-family: var(--font-mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(255,255,255,0.92); color: var(--rock); padding: 0.35rem 0.7rem; border-radius: 999px; }
+.journal-meta { display: flex; gap: 1rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--rock-soft); margin-bottom: 0.6rem; }
+.journal-card h3 { font-size: 1.2rem; margin-bottom: 0.6rem; }
+.journal-read { display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 700; font-size: 0.88rem; margin-top: auto; padding-top: 1rem; }
+.journal-read .icon { width: 15px; height: 15px; }
+
+/* ---------- 21. FAQ ---------- */
+.faq-list { max-width: 800px; margin: 0 auto; }
+.faq-item { border-bottom: 1px solid var(--border); }
+.faq-question { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 1.75rem 0; text-align: left; font-family: var(--font-body); font-weight: 700; font-size: 1.02rem; }
+.faq-question .icon { transition: transform var(--speed) var(--ease); flex-shrink: 0; color: var(--yellow); }
+.faq-item.is-open .faq-question .icon { transform: rotate(180deg); }
+.faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s var(--ease); }
+.faq-answer p { padding-bottom: 1.75rem; max-width: 65ch; }
+.faq-item.is-open .faq-answer { max-height: 240px; }
+
+/* ---------- 22. CTA banner ---------- */
+.cta-banner { background: var(--rock); color: var(--chalk); text-align: center; overflow: hidden; }
+.cta-banner h2 { color: var(--chalk); }
+.cta-banner p { color: rgba(238,240,238,0.7); max-width: 44ch; margin: 1.25rem auto 2.25rem; }
+
+/* ---------- 23. Contact ---------- */
+.contact-grid { grid-template-columns: 1fr 0.85fr; gap: 4rem; }
+.contact-info-item { display: flex; gap: 1rem; margin-bottom: 1.75rem; }
+.contact-info-item .icon-wrap { width: 44px; height: 44px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--yellow); }
+.contact-info-item h4 { margin-bottom: 0.25rem; }
+.contact-info-item p { font-size: 0.92rem; }
+.contact-form-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2.5rem; }
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+
+/* ---------- 24. Footer, misc ---------- */
+.footer { background: var(--rock); color: var(--chalk); padding: 5rem 0 0; }
+.footer .logo { color: var(--chalk); }
+.footer .logo-mark path { fill: var(--chalk); }
+.footer-grid { grid-template-columns: 1.4fr 1fr 1fr 1.2fr; gap: 3rem; padding-bottom: 3.5rem; }
+.footer p { color: rgba(238,240,238,0.62); font-size: 0.92rem; }
+.footer-blurb { margin: 1.1rem 0 1.5rem; max-width: 34ch; }
+.footer-social { display: flex; gap: 0.7rem; }
+.footer-social a { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid rgba(238,240,238,0.25); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; transition: all var(--speed) var(--ease); }
+.footer-social a:hover { background: var(--yellow); border-color: var(--yellow); color: var(--rock); }
+.footer h4 { color: var(--chalk); font-size: 0.82rem; letter-spacing: 0.05em; text-transform: uppercase; font-family: var(--font-mono); margin-bottom: 1.4rem; }
+.footer-links { display: flex; flex-direction: column; gap: 0.85rem; }
+.footer-links a { color: rgba(238,240,238,0.7); font-size: 0.94rem; transition: color var(--speed) var(--ease); }
+.footer-links a:hover { color: var(--chalk); }
+.footer-newsletter-form { display: flex; gap: 0.6rem; margin-top: 1.25rem; }
+.footer-newsletter-form input { flex: 1; background: rgba(238,240,238,0.08); border: 1.5px solid rgba(238,240,238,0.2); border-radius: var(--radius-sm); padding: 0.8rem 1rem; color: var(--chalk); font-size: 0.9rem; }
+.footer-newsletter-form input::placeholder { color: rgba(238,240,238,0.45); }
+.footer-newsletter-form button { width: 46px; flex-shrink: 0; border-radius: var(--radius-sm); background: var(--yellow); display: flex; align-items: center; justify-content: center; transition: background var(--speed) var(--ease); }
+.footer-newsletter-form button:hover { background: var(--blue); }
+.footer-newsletter-form button .icon { color: var(--rock); }
+.footer-newsletter-form button:hover .icon { color: #fff; }
+.footer-bottom { border-top: 1px solid rgba(238,240,238,0.14); padding: 1.75rem 0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+.footer-bottom p { font-size: 0.82rem; }
+.footer-legal { display: flex; gap: 1.5rem; }
+.footer-legal a { font-size: 0.82rem; color: rgba(238,240,238,0.62); }
+.footer-legal a:hover { color: var(--chalk); }
+
+.back-to-top { position: fixed; right: 1.75rem; bottom: 1.75rem; width: 50px; height: 50px; border-radius: 50%; background: var(--rock); color: var(--chalk); display: flex; align-items: center; justify-content: center; z-index: 850; opacity: 0; visibility: hidden; transform: translateY(12px); transition: all var(--speed) var(--ease); }
+.back-to-top.is-visible { opacity: 1; visibility: visible; transform: translateY(0); }
+.back-to-top:hover { background: var(--yellow); color: var(--rock); }
+
+.toast { position: fixed; left: 50%; bottom: 2rem; transform: translate(-50%, 20px); background: var(--rock); color: var(--chalk); padding: 1rem 1.5rem; border-radius: var(--radius-sm); display: flex; align-items: center; gap: 0.75rem; font-size: 0.92rem; z-index: 9999; opacity: 0; visibility: hidden; transition: all var(--speed) var(--ease); box-shadow: 0 12px 30px -10px rgba(0,0,0,0.4); }
+.toast.is-visible { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+.toast .icon { color: var(--yellow); }
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(10, 9, 8, 0.7); z-index: 9500; display: flex; align-items: center; justify-content: center; padding: 1.5rem; opacity: 0; visibility: hidden; transition: all var(--speed) var(--ease); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+.modal-overlay.is-visible { opacity: 1; visibility: visible; }
+.modal-box { background: var(--chalk); border-radius: var(--radius-lg); max-width: 640px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 2.5rem; position: relative; transform: scale(0.94) translateY(10px); transition: transform var(--speed) var(--ease); }
+.modal-overlay.is-visible .modal-box { transform: scale(1) translateY(0); }
+.modal-close { position: absolute; top: 1.5rem; right: 1.5rem; width: 38px; height: 38px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; }
+.modal-thumb { aspect-ratio: 16/9; border-radius: var(--radius-md); margin-bottom: 1.5rem; position: relative; overflow: hidden; }
+.modal-specs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1.5rem 0; font-family: var(--font-mono); font-size: 0.82rem; }
+.modal-specs div { padding: 0.9rem; background: var(--surface); border-radius: var(--radius-sm); border: 1px solid var(--border); }
+.modal-specs strong { display: block; color: var(--rock-soft); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.35rem; }
+
+.testimonial-wrap { max-width: 780px; margin: 0 auto; text-align: center; position: relative; }
+.testimonial-slide { display: none; }
+.testimonial-slide.is-active { display: block; animation: fade-up 0.5s var(--ease); }
+.testimonial-text { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.25rem, 2.4vw, 1.7rem); line-height: 1.35; color: var(--rock); margin-bottom: 1.75rem; }
+.testimonial-author { font-weight: 800; }
+.testimonial-role { font-family: var(--font-mono); font-size: 0.8rem; color: var(--rock-soft); margin-top: 0.2rem; }
+.testimonial-stars { display: flex; justify-content: center; gap: 4px; margin-bottom: 1.25rem; color: var(--yellow); }
+.testimonial-stars .icon { width: 16px; height: 16px; }
+.testimonial-controls { display: flex; align-items: center; justify-content: center; gap: 1.5rem; margin-top: 2.5rem; }
+.testimonial-arrow { width: 46px; height: 46px; border-radius: 50%; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; transition: all var(--speed) var(--ease); }
+.testimonial-arrow:hover { border-color: var(--rock); transform: scale(1.06); }
+.testimonial-dots { display: flex; gap: 8px; }
+.testimonial-dots button { width: 8px; height: 8px; border-radius: 50%; background: var(--border); transition: all var(--speed) var(--ease); }
+.testimonial-dots button.is-active { background: var(--yellow); width: 22px; border-radius: 5px; }
+
+[data-reveal] { opacity: 0; transform: translateY(28px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+[data-reveal].is-visible { opacity: 1; transform: translateY(0); }
+[data-reveal="fade"] { transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  [data-reveal] { opacity: 1; transform: none; }
+  .ticker-track { animation: none; }
+}
+
+@media (max-width: 1180px) {
+  .route-grid { grid-template-columns: repeat(3, 1fr); }
+  .team-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero-topo { width: 480px; }
+}
+
+@media (max-width: 992px) {
+  .nav { position: fixed; top: 0; right: -100%; width: min(360px, 84vw); height: 100vh; background: var(--chalk); flex-direction: column; align-items: flex-start; justify-content: flex-start; padding: 7rem 2.25rem 2rem; transition: right var(--speed) var(--ease); box-shadow: -20px 0 50px -20px rgba(0,0,0,0.25); z-index: 950; }
+  .nav.is-open { right: 0; }
+  .nav-list { flex-direction: column; align-items: flex-start; gap: 1.6rem; width: 100%; }
+  .nav-link { font-size: 1.15rem; }
+  .hamburger { display: flex; }
+  .header-actions .btn-primary.btn-sm { display: none; }
+  .about-grid, .contact-grid { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 2.5rem; }
+  .services-grid, .pricing-grid, .journal-grid { grid-template-columns: repeat(2, 1fr); }
+  .route-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .price-card.is-featured { order: -1; }
+  .hero-topo { display: none; }
+}
+
+@media (max-width: 700px) {
+  .process-item { grid-template-columns: 1fr; gap: 0.5rem; }
+  .form-row-2 { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; }
+  .schedule-row { grid-template-columns: 1fr; gap: 0.35rem; }
+}
+
+@media (max-width: 560px) {
+  .stats-grid, .services-grid, .pricing-grid, .journal-grid, .route-grid, .team-grid { grid-template-columns: 1fr; }
+  .hero-actions { flex-direction: column; align-items: stretch; }
+  .hero-actions .btn { justify-content: center; }
+  .back-to-top { right: 1rem; bottom: 1rem; width: 44px; height: 44px; }
+}
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<div class="preloader" id="preloader">
+  <div class="preloader-mark"><svg viewBox="0 0 32 26" aria-hidden="true"><path d="M1 25 L10 8 L15 16 L20 6 L31 25 Z"/></svg></div>
+  <div class="preloader-bar"><span></span></div>
+  <div class="preloader-label">Chalking up</div>
+</div>
+
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-outline" id="cursorOutline"></div>
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<svg style="display:none" aria-hidden="true">
+  <symbol id="icon-close" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+  <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><line x1="12" y1="1.5" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22.5"/><line x1="1.5" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22.5" y2="12"/><line x1="4.5" y1="4.5" x2="6.2" y2="6.2"/><line x1="17.8" y1="17.8" x2="19.5" y2="19.5"/><line x1="4.5" y1="19.5" x2="6.2" y2="17.8"/><line x1="17.8" y1="6.2" x2="19.5" y2="4.5"/></symbol>
+  <symbol id="icon-moon" viewBox="0 0 24 24"><mask id="moonMask2"><rect width="24" height="24" fill="#fff"/><circle cx="15.2" cy="8.8" r="6.4" fill="#000"/></mask><circle cx="12" cy="12" r="8.4" fill="currentColor" stroke="none" mask="url(#moonMask2)"/></symbol>
+  <symbol id="icon-arrow-right" viewBox="0 0 24 24"><line x1="4" y1="12" x2="20" y2="12"/><polyline points="13 5 20 12 13 19"/></symbol>
+  <symbol id="icon-arrow-up-right" viewBox="0 0 24 24"><line x1="6" y1="18" x2="18" y2="6"/><polyline points="8 6 18 6 18 16"/></symbol>
+  <symbol id="icon-arrow-up" viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="6 11 12 5 18 11"/></symbol>
+  <symbol id="icon-chevron-down" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
+  <symbol id="icon-star" viewBox="0 0 24 24"><polygon class="icon-fill" points="12 2 14.9 8.6 22 9.3 16.7 14 18.2 21 12 17.3 5.8 21 7.3 14 2 9.3 9.1 8.6"/></symbol>
+  <symbol id="icon-check" viewBox="0 0 24 24"><polyline points="5 13 9 17 19 7"/></symbol>
+  <symbol id="icon-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2"/><polyline points="8 12.5 11 15.5 16.5 9"/></symbol>
+  <symbol id="icon-play" viewBox="0 0 24 24"><polygon class="icon-fill" points="7 4 20 12 7 20"/></symbol>
+  <symbol id="icon-send" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+  <symbol id="icon-mail" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2.2"/><polyline points="3 6.5 12 13 21 6.5"/></symbol>
+  <symbol id="icon-phone" viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></symbol>
+  <symbol id="icon-map-pin" viewBox="0 0 24 24"><path d="M12 21s7-7.6 7-12.4A7 7 0 0 0 5 8.6C5 13.4 12 21 12 21z"/><circle cx="12" cy="8.6" r="2.5"/></symbol>
+  <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.3"/><polyline points="12 6.8 12 12 15.8 14.2"/></symbol>
+  <symbol id="icon-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.3 20c0-3.6 2.5-6 5.7-6s5.7 2.4 5.7 6"/><circle cx="17.3" cy="9" r="2.5"/><path d="M15.8 14.1c2.6.4 4.4 2.6 4.4 5.9"/></symbol>
+  <symbol id="icon-award" viewBox="0 0 24 24"><circle cx="12" cy="8.2" r="5.6"/><polyline points="8.3 13 6.7 21.5 12 18.3 17.3 21.5 15.7 13"/></symbol>
+  <symbol id="icon-mountain" viewBox="0 0 24 24"><path d="M2.5 20.5 L8.5 9 L12 14.5 L15.5 7.5 L21.5 20.5 Z"/></symbol>
+  <symbol id="icon-carabiner" viewBox="0 0 24 24"><rect x="5" y="3" width="10" height="18" rx="5"/><line x1="15" y1="12" x2="19.5" y2="12"/></symbol>
+  <symbol id="icon-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle class="icon-fill" cx="12" cy="12" r="1.4"/></symbol>
+  <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></symbol>
+  <symbol id="icon-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="9.5" x2="21" y2="9.5"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></symbol>
+  <symbol id="icon-droplet" viewBox="0 0 24 24"><path d="M12 2.5s7 8 7 12.6A7 7 0 1 1 5 15.1C5 10.5 12 2.5 12 2.5z"/></symbol>
+</svg>
+
+<header class="header" id="header">
+  <div class="container header-inner">
+    <a href="#home" class="logo">
+      <svg class="logo-mark" viewBox="0 0 32 26" aria-hidden="true"><path d="M1 25 L10 8 L15 16 L20 6 L31 25 Z"/></svg>
+      Crux
+    </a>
+    <nav class="nav" id="nav">
+      <ul class="nav-list">
+        <li><a href="#gym" class="nav-link">The Gym</a></li>
+        <li><a href="#services" class="nav-link">Classes</a></li>
+        <li><a href="#routes" class="nav-link">Routes</a></li>
+        <li><a href="#pricing" class="nav-link">Membership</a></li>
+        <li><a href="#schedule" class="nav-link">Schedule</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="header-actions">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+        <svg class="icon icon-sun" aria-hidden="true"><use href="#icon-sun"></use></svg>
+        <svg class="icon icon-moon" aria-hidden="true"><use href="#icon-moon"></use></svg>
+      </button>
+      <a href="#contact" class="btn btn-primary btn-sm">Book a day pass</a>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero" id="home">
+    <svg class="hero-topo" viewBox="0 0 500 500" aria-hidden="true">
+      <g fill="none" stroke="currentColor" stroke-width="1.4">
+        <path d="M40 420 Q150 300 130 200 Q110 100 220 60 Q330 20 400 120 Q460 200 420 300 Q390 380 300 420 Q180 460 40 420 Z"/>
+        <path d="M80 400 Q170 300 155 210 Q140 120 230 90 Q320 60 375 140 Q425 210 395 290 Q370 355 295 390 Q195 425 80 400 Z"/>
+        <path d="M120 375 Q190 300 180 225 Q170 150 240 130 Q310 110 350 170 Q385 225 360 285 Q340 335 280 360 Q205 390 120 375 Z"/>
+        <path d="M160 350 Q210 300 205 245 Q200 190 250 175 Q300 160 325 205 Q345 245 325 285 Q305 320 260 335 Q205 355 160 350 Z"/>
+      </g>
+    </svg>
+    <div class="container hero-inner">
+      <p class="eyebrow">INDOOR BOULDERING &amp; CLIMBING GYM</p>
+      <h1 data-reveal="fade">Find your crux.<br>Send it anyway.</h1>
+      <p class="lede" data-reveal="fade">Crux is a bouldering gym for climbers who haven't started yet and climbers who never stop. Forty-plus routes reset every week, coaching for every level, and walls that don't care how long you've been at this.</p>
+
+      <div class="hero-actions">
+        <a href="#contact" class="btn btn-primary">Book a day pass<svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg></a>
+        <a href="#routes" class="btn btn-outline"><svg class="icon" aria-hidden="true"><use href="#icon-play"></use></svg>See this week's routes</a>
+      </div>
+
+      <div class="hero-spec-strip">
+        <span>40+ routes reset weekly</span>
+        <span>18ft walls</span>
+        <span>Beginner-friendly</span>
+        <span>Gear rental on-site</span>
+      </div>
+
+      <a href="#gym" class="hero-scrolldown">Scroll<svg class="icon" aria-hidden="true"><use href="#icon-chevron-down"></use></svg></a>
+    </div>
+  </section>
+
+  <!-- ============ ROUTE TICKER ============ -->
+  <section class="ticker-section">
+    <p class="ticker-label">This week's setlist</p>
+    <div class="ticker-track" aria-hidden="true">
+      <div class="ticker-item"><span class="name">Low Tide</span><span class="grade-badge grade-yellow"><span class="dot"></span>Intro</span></div>
+      <div class="ticker-item"><span class="name">Ceiling Cat</span><span class="grade-badge grade-purple"><span class="dot"></span>Expert</span></div>
+      <div class="ticker-item"><span class="name">Slab Happy</span><span class="grade-badge grade-blue"><span class="dot"></span>Intermediate</span></div>
+      <div class="ticker-item"><span class="name">Barn Door</span><span class="grade-badge grade-red"><span class="dot"></span>Advanced</span></div>
+      <div class="ticker-item"><span class="name">Crimp de la Crimp</span><span class="grade-badge grade-purple"><span class="dot"></span>Expert</span></div>
+      <div class="ticker-item"><span class="name">Morning Warm-up</span><span class="grade-badge grade-yellow"><span class="dot"></span>Intro</span></div>
+      <div class="ticker-item"><span class="name">Left of Center</span><span class="grade-badge grade-blue"><span class="dot"></span>Intermediate</span></div>
+      <div class="ticker-item"><span class="name">Low Tide</span><span class="grade-badge grade-yellow"><span class="dot"></span>Intro</span></div>
+      <div class="ticker-item"><span class="name">Ceiling Cat</span><span class="grade-badge grade-purple"><span class="dot"></span>Expert</span></div>
+      <div class="ticker-item"><span class="name">Slab Happy</span><span class="grade-badge grade-blue"><span class="dot"></span>Intermediate</span></div>
+      <div class="ticker-item"><span class="name">Barn Door</span><span class="grade-badge grade-red"><span class="dot"></span>Advanced</span></div>
+      <div class="ticker-item"><span class="name">Crimp de la Crimp</span><span class="grade-badge grade-purple"><span class="dot"></span>Expert</span></div>
+      <div class="ticker-item"><span class="name">Morning Warm-up</span><span class="grade-badge grade-yellow"><span class="dot"></span>Intro</span></div>
+      <div class="ticker-item"><span class="name">Left of Center</span><span class="grade-badge grade-blue"><span class="dot"></span>Intermediate</span></div>
+    </div>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section class="about" id="gym">
+    <div class="container grid about-grid">
+      <div data-reveal>
+        <p class="eyebrow">THE GYM</p>
+        <h2>Eighteen feet of wall, reset every Monday.</h2>
+        <p class="lede" style="margin-top:1.25rem;">Crux opened in 2018 with four walls and a folding table for a front desk. We've grown into a full facility, but the philosophy hasn't changed: routes should get reset often enough that regulars never get bored, and beginners should never feel like they wandered into someone else's gym.</p>
+        <ul class="about-checklist">
+          <li><svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg> Routes reset every week across all four grades</li>
+          <li><svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg> Free beginner orientation with every first visit</li>
+          <li><svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg> Coaches on the floor during all open hours</li>
+          <li><svg class="icon" aria-hidden="true"><use href="#icon-check"></use></svg> Gear rental included, no membership required</li>
+        </ul>
+      </div>
+      <div class="legend-panel" data-reveal>
+        <span class="legend-panel-label">The grading key — posted at the front desk</span>
+        <div class="legend-row"><div class="tape"><span class="swatch" style="background:var(--yellow)"></span>Yellow tape</div><div class="desc">INTRO<br>First-timer friendly</div></div>
+        <div class="legend-row"><div class="tape"><span class="swatch" style="background:var(--blue)"></span>Blue tape</div><div class="desc">INTERMEDIATE<br>A few months in</div></div>
+        <div class="legend-row"><div class="tape"><span class="swatch" style="background:var(--red)"></span>Red tape</div><div class="desc">ADVANCED<br>Regular climber</div></div>
+        <div class="legend-row"><div class="tape"><span class="swatch" style="background:var(--purple)"></span>Purple tape</div><div class="desc">EXPERT<br>Setter-approved only</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STATS ============ -->
+  <section class="stats section-alt">
+    <div class="container">
+      <div class="grid stats-grid">
+        <div data-reveal><div class="stat-num" data-count="40" data-suffix="+">0</div><p class="stat-label">ROUTES RESET WEEKLY</p></div>
+        <div data-reveal><div class="stat-num" data-count="18" data-suffix="ft">0</div><p class="stat-label">TOP-OUT HEIGHT</p></div>
+        <div data-reveal><div class="stat-num" data-count="7">0</div><p class="stat-label">COACHES ON STAFF</p></div>
+        <div data-reveal><div class="stat-num" data-count="500" data-suffix="+">0</div><p class="stat-label">ACTIVE MEMBERS</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SERVICES ============ -->
+  <section class="services" id="services">
+    <div class="container">
+      <div class="section-head center" data-reveal>
+        <p class="eyebrow" style="justify-content:center;">TRAIN WITH US</p>
+        <h2>Six ways to spend a session</h2>
+        <p>Drop in for open bouldering or work with a coach — either way, the walls don't judge.</p>
+      </div>
+      <div class="grid services-grid">
+        <div class="service-card" data-reveal><div class="service-icon"><svg class="icon" aria-hidden="true"><use href="#icon-mountain"></use></svg></div><h3>Open Bouldering</h3><p>Full access to every route on the floor, any hour we're open, no reservation needed.</p><a href="#pricing" class="service-link">See day passes <svg class="icon" aria-hidden="true"><use href="#icon-arrow-up-right"></use></svg></a></div>
+        <div class="service-card" data-reveal><div class="service-icon"><svg class="icon" aria-hidden="true"><use href="#icon-users"></use></svg></div><h3>Beginner Classes</h3><p>Ninety minutes on footwork, falling safely, and reading your first routes.</p><a href="#schedule" class="service-link">See class times <svg class="icon" aria-hidden="true"><use href="#icon-arrow-up-right"></use></svg></a></div>
+        <div class="service-card" data-reveal><div class="service-icon"><svg class="icon" aria-hidden="true"><use href="#icon-award"></use></svg></div><h3>Youth Programs</h3><p>After-school squads for ages 8–17, grouped by experience, run by our junior coaches.</p><a href="#schedule" class="service-link">See class times <svg class="icon" aria-hidden="true"><use href="#icon-arrow-up-right"></use></svg></a></div>
+        <div class="service-card" data-reveal><div class="service-icon"><svg class="icon" aria-hidden="true"><use href="#icon-target"></use></svg></div><h3>Personal Coaching</h3><p>One-on-one sessions to work a specific project or push past a plateau.</p><a href="#contact" class="service-link">Ask about rates <svg class="icon" aria-hidden="true"><use href="#icon-arrow-up-right"></use></svg></a></div>
+        <div class="service-card" data-reveal><div class="service-icon"><svg class="icon" aria-hidden="true"><use href="#icon-carabiner"></use></svg></div><h3>Route-Setting Workshops</h3><p>Learn how routes actually get built, straight from our head setter.</p><a href="#journal" class="service-link">Read about setting <svg class="icon" aria-hidden="true"><use href="#icon-arrow-up-right"></use></svg></a></div>
+        <div class="service-card" data-reveal><div class="service-icon"><svg class="icon" aria-hidden="true"><use href="#icon-shield"></use></svg></div><h3>Gear Rentals</h3><p>Shoes and chalk bags included with every visit — no need to own anything yet.</p><a href="#faq" class="service-link">Read the FAQ <svg class="icon" aria-hidden="true"><use href="#icon-arrow-up-right"></use></svg></a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROCESS ============ -->
+  <section class="process section-alt">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">YOUR FIRST SESSION</p>
+        <h2>How to send your first route</h2>
+        <p>Every new climber goes through the same four steps — it's the fastest way to get comfortable on the wall.</p>
+      </div>
+      <div class="process-list">
+        <div class="process-item" data-reveal><div class="process-num">01</div><div><div class="icon-wrap"><svg class="icon" aria-hidden="true"><use href="#icon-droplet"></use></svg></div><h3>Chalk up</h3><p>A little chalk on dry hands. Too much and you'll slide right off — we'll show you the right amount.</p></div></div>
+        <div class="process-item" data-reveal><div class="process-num">02</div><div><div class="icon-wrap"><svg class="icon" aria-hidden="true"><use href="#icon-target"></use></svg></div><h3>Read the route</h3><p>Look up before you climb. Trace the holds with your eyes and plan three moves ahead.</p></div></div>
+        <div class="process-item" data-reveal><div class="process-num">03</div><div><div class="icon-wrap"><svg class="icon" aria-hidden="true"><use href="#icon-mountain"></use></svg></div><h3>Climb</h3><p>Start on yellow tape. Move with your legs, not your arms — they'll last a lot longer.</p></div></div>
+        <div class="process-item" data-reveal><div class="process-num">04</div><div><div class="icon-wrap"><svg class="icon" aria-hidden="true"><use href="#icon-shield"></use></svg></div><h3>Fall safely</h3><p>Bend your knees, land flat-footed, roll if you need to. Falling is half the sport.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ROUTES (portfolio) ============ -->
+  <section class="portfolio" id="routes">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">ON THE WALL NOW</p>
+        <h2>This week's routes</h2>
+        <p>Filter by tape color to find something in your range.</p>
+      </div>
+      <div class="route-filters" data-reveal>
+        <button class="filter-btn is-active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="yellow"><span class="dot" style="background:var(--yellow)"></span>Yellow</button>
+        <button class="filter-btn" data-filter="blue"><span class="dot" style="background:var(--blue)"></span>Blue</button>
+        <button class="filter-btn" data-filter="red"><span class="dot" style="background:var(--red)"></span>Red</button>
+        <button class="filter-btn" data-filter="purple"><span class="dot" style="background:var(--purple)"></span>Purple</button>
+      </div>
+
+      <div class="grid route-grid" id="routeGrid">
+        <article class="route-card" data-category="yellow" data-reveal data-title="Low Tide" data-setter="Set by Robin A." data-cat-label="Yellow — Intro" data-note="A friendly slab traverse, great for a first attempt. Big holds, low commitment." data-height="12ft" data-angle="Slab" data-grade="Yellow">
+          <div class="route-thumb"><div class="base" style="background:var(--yellow)"></div><div class="hold" style="width:26%;height:14%;top:20%;left:30%;background:rgba(30,30,28,0.85)"></div><div class="hold" style="width:18%;height:10%;top:55%;left:55%;background:rgba(30,30,28,0.85)"></div><div class="hold" style="width:20%;height:12%;top:75%;left:20%;background:rgba(30,30,28,0.85)"></div></div>
+          <div class="route-meta"><h4>Low Tide</h4></div><span class="route-setter">Set by Robin A.</span>
+        </article>
+        <article class="route-card" data-category="blue" data-reveal data-title="Slab Happy" data-setter="Set by Dana K." data-cat-label="Blue — Intermediate" data-note="Technical footwork on a low-angle wall. Balance matters more than strength here." data-height="15ft" data-angle="Slab" data-grade="Blue">
+          <div class="route-thumb"><div class="base" style="background:var(--blue)"></div><div class="hold" style="width:22%;height:12%;top:15%;left:50%;background:rgba(255,255,255,0.92)"></div><div class="hold" style="width:16%;height:16%;top:45%;left:25%;background:rgba(255,255,255,0.92)"></div><div class="hold" style="width:24%;height:10%;top:70%;left:45%;background:rgba(255,255,255,0.92)"></div></div>
+          <div class="route-meta"><h4>Slab Happy</h4></div><span class="route-setter">Set by Dana K.</span>
+        </article>
+        <article class="route-card" data-category="red" data-reveal data-title="Barn Door" data-setter="Set by Robin A." data-cat-label="Red — Advanced" data-note="A steep overhang that punishes bad footwork. Watch the swing on move four." data-height="16ft" data-angle="Overhang" data-grade="Red">
+          <div class="route-thumb"><div class="base" style="background:var(--red)"></div><div class="hold" style="width:20%;height:14%;top:18%;left:35%;background:rgba(255,255,255,0.92)"></div><div class="hold" style="width:18%;height:12%;top:48%;left:60%;background:rgba(255,255,255,0.92)"></div><div class="hold" style="width:22%;height:10%;top:72%;left:30%;background:rgba(255,255,255,0.92)"></div></div>
+          <div class="route-meta"><h4>Barn Door</h4></div><span class="route-setter">Set by Robin A.</span>
+        </article>
+        <article class="route-card" data-category="purple" data-reveal data-title="Ceiling Cat" data-setter="Set by Marcus F." data-cat-label="Purple — Expert" data-note="A roof problem with a dyno finish. Setter-approved for good reason." data-height="18ft" data-angle="Roof" data-grade="Purple">
+          <div class="route-thumb"><div class="base" style="background:var(--purple)"></div><div class="hold" style="width:18%;height:12%;top:22%;left:40%;background:rgba(255,255,255,0.92)"></div><div class="hold" style="width:20%;height:10%;top:50%;left:20%;background:rgba(255,255,255,0.92)"></div><div class="hold" style="width:16%;height:14%;top:75%;left:55%;background:rgba(255,255,255,0.92)"></div></div>
+          <div class="route-meta"><h4>Ceiling Cat</h4></div><span class="route-setter">Set by Marcus F.</span>
+        </article>
+        <article class="route-card" data-category="yellow" data-reveal data-title="Morning Warm-up" data-setter="Set by Dana K." data-cat-label="Yellow — Intro" data-note="Big jugs, straight up. The route most people learn to top out on." data-height="10ft" data-angle="Vertical" data-grade="Yellow">
+          <div class="route-thumb"><div class="base" style="background:var(--yellow)"></div><div class="hold" style="width:24%;height:12%;top:25%;left:38%;background:rgba(30,30,28,0.85)"></div><div class="hold" style="width:20%;height:14%;top:55%;left:35%;background:rgba(30,30,28,0.85)"></div><div class="hold" style="width:22%;height:10%;top:78%;left:40%;background:rgba(30,30,28,0.85)"></div></div>
+          <div class="route-meta"><h4>Morning Warm-up</h4></div><span class="route-setter">Set by Dana K.</span>
+        </article>
+        <article class="route-card" data-category="blue" data-reveal data-title="Left of Center" data-setter="Set by Yuki T." data-cat-label="Blue — Intermediate" data-note="A diagonal traverse across the whole west wall. Good for building endurance." data-height="14ft" data-angle="Vertical" data-grade="Blue">
+          <div class="route-thumb"><div class="base" style="background:var(--blue)"></div><div class="hold" style="width:20%;height:12%;top:20%;left:20%;background:rgba(255,255,255,0.92)"></div><div class="hold" style="width:18%;height:10%;top:48%;left:50%;background:rgba(255,255,255,0.92)"></div><div class="hold" style="width:22%;height:14%;top:74%;left:65%;background:rgba(255,255,255,0.92)"></div></div>
+          <div class="route-meta"><h4>Left of Center</h4></div><span class="route-setter">Set by Yuki T.</span>
+        </article>
+        <article class="route-card" data-category="red" data-reveal data-title="Crimp de la Crimp" data-setter="Set by Marcus F." data-cat-label="Red — Advanced" data-note="Tiny crimps and a lot of tension. Bring tape for your fingertips." data-height="16ft" data-angle="Vertical" data-grade="Red">
+          <div class="route-thumb"><div class="base" style="background:var(--red)"></div><div class="hold" style="width:14%;height:8%;top:20%;left:45%;background:rgba(255,255,255,0.92)"></div><div class="hold" style="width:12%;height:8%;top:45%;left:35%;background:rgba(255,255,255,0.92)"></div><div class="hold" style="width:16%;height:10%;top:70%;left:50%;background:rgba(255,255,255,0.92)"></div></div>
+          <div class="route-meta"><h4>Crimp de la Crimp</h4></div><span class="route-setter">Set by Marcus F.</span>
+        </article>
+        <article class="route-card" data-category="purple" data-reveal data-title="Setter's Revenge" data-setter="Set by Robin A." data-cat-label="Purple — Expert" data-note="The current hardest route in the gym. Nobody's flashed it yet." data-height="18ft" data-angle="Overhang" data-grade="Purple">
+          <div class="route-thumb"><div class="base" style="background:var(--purple)"></div><div class="hold" style="width:16%;height:10%;top:18%;left:30%;background:rgba(255,255,255,0.92)"></div><div class="hold" style="width:14%;height:12%;top:48%;left:55%;background:rgba(255,255,255,0.92)"></div><div class="hold" style="width:18%;height:10%;top:75%;left:35%;background:rgba(255,255,255,0.92)"></div></div>
+          <div class="route-meta"><h4>Setter's Revenge</h4></div><span class="route-setter">Set by Robin A.</span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TESTIMONIALS ============ -->
+  <section class="testimonials section-alt">
+    <div class="container">
+      <div class="testimonial-wrap">
+        <p class="eyebrow" style="justify-content:center;">WHAT MEMBERS SAY</p>
+        <div class="testimonial-slide is-active" data-reveal>
+          <div class="testimonial-stars"><svg class="icon icon-fill" aria-hidden="true"><use href="#icon-star"></use></svg><svg class="icon icon-fill" aria-hidden="true"><use href="#icon-star"></use></svg><svg class="icon icon-fill" aria-hidden="true"><use href="#icon-star"></use></svg><svg class="icon icon-fill" aria-hidden="true"><use href="#icon-star"></use></svg><svg class="icon icon-fill" aria-hidden="true"><use href="#icon-star"></use></svg></div>
+          <p class="testimonial-text">"I'd never climbed anything before. Six months later I'm working blue tape and I actually look forward to Mondays."</p>
+          <p class="testimonial-author">Priya Anand</p><p class="testimonial-role">Member since 2024</p>
+        </div>
+        <div class="testimonial-slide">
+          <div class="testimonial-stars"><svg class="icon icon-fill" aria-hidden="true"><use href="#icon-star"></use></svg><svg class="icon icon-fill" aria-hidden="true"><use href="#icon-star"></use></svg><svg class="icon icon-fill" aria-hidden="true"><use href="#icon-star"></use></svg><svg class="icon icon-fill" aria-hidden="true"><use href="#icon-star"></use></svg><svg class="icon icon-fill" aria-hidden="true"><use href="#icon-star"></use></svg></div>
+          <p class="testimonial-text">"The Monday resets keep it interesting. I've been climbing five years and I still haven't gotten bored of this gym."</p>
+          <p class="testimonial-author">Tomas Ibarra</p><p class="testimonial-role">Member since 2019</p>
+        </div>
+        <div class="testimonial-slide">
+          <div class="testimonial-stars"><svg class="icon icon-fill" aria-hidden="true"><use href="#icon-star"></use></svg><svg class="icon icon-fill" aria-hidden="true"><use href="#icon-star"></use></svg><svg class="icon icon-fill" aria-hidden="true"><use href="#icon-star"></use></svg><svg class="icon icon-fill" aria-hidden="true"><use href="#icon-star"></use></svg><svg class="icon icon-fill" aria-hidden="true"><use href="#icon-star"></use></svg></div>
+          <p class="testimonial-text">"My kid's youth squad session is the highlight of her week. The coaches genuinely know every kid's name."</p>
+          <p class="testimonial-author">Dee Okafor</p><p class="testimonial-role">Parent, Youth Program</p>
+        </div>
+        <div class="testimonial-controls">
+          <button class="testimonial-arrow" id="testimonialPrev" aria-label="Previous testimonial"><svg class="icon" style="transform:rotate(180deg)" aria-hidden="true"><use href="#icon-arrow-right"></use></svg></button>
+          <div class="testimonial-dots" id="testimonialDots"></div>
+          <button class="testimonial-arrow" id="testimonialNext" aria-label="Next testimonial"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRICING ============ -->
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <div class="section-head center" data-reveal>
+        <p class="eyebrow" style="justify-content:center;">MEMBERSHIP</p>
+        <h2>What it costs to climb here</h2>
+        <p>Students and members with a valid ID get a discounted rate — flip the switch to compare.</p>
+      </div>
+      <div class="pricing-toggle-wrap" data-reveal>
+        <span>Standard</span>
+        <button class="pricing-toggle" id="pricingToggle" role="switch" aria-checked="false" aria-label="Toggle between standard and student pricing"><span class="knob"></span></button>
+        <span>Student</span>
+      </div>
+      <div class="grid pricing-grid">
+        <div class="price-card" data-reveal>
+          <p class="price-name">Day Pass</p><p class="price-desc">Try it once</p>
+          <div class="price-amount"><span class="num" data-price-1="22" data-price-2="16">$22</span><span class="unit">/ visit</span></div>
+          <div class="price-features">
+            <div class="price-feature"><svg class="icon" aria-hidden="true"><use href="#icon-check-circle"></use></svg> Full facility access</div>
+            <div class="price-feature"><svg class="icon" aria-hidden="true"><use href="#icon-check-circle"></use></svg> Free shoe rental, first visit</div>
+            <div class="price-feature"><svg class="icon" aria-hidden="true"><use href="#icon-check-circle"></use></svg> Beginner orientation available</div>
+          </div>
+          <a href="#contact" class="btn btn-outline btn-block">Book a day pass</a>
+        </div>
+        <div class="price-card is-featured" data-reveal>
+          <span class="price-badge">Climber favorite</span>
+          <p class="price-name">Class Pack</p><p class="price-desc">10-visit punch card</p>
+          <div class="price-amount"><span class="num" data-price-1="180" data-price-2="140">$180</span><span class="unit">/ 10 visits</span></div>
+          <div class="price-features">
+            <div class="price-feature"><svg class="icon" aria-hidden="true"><use href="#icon-check-circle"></use></svg> Never expires within 6 months</div>
+            <div class="price-feature"><svg class="icon" aria-hidden="true"><use href="#icon-check-circle"></use></svg> Bring a friend once, free</div>
+            <div class="price-feature"><svg class="icon" aria-hidden="true"><use href="#icon-check-circle"></use></svg> Discounted gear rental</div>
+          </div>
+          <a href="#contact" class="btn btn-primary btn-block">Get a class pack</a>
+        </div>
+        <div class="price-card" data-reveal>
+          <p class="price-name">Unlimited</p><p class="price-desc">For regulars</p>
+          <div class="price-amount"><span class="num" data-price-1="89" data-price-2="65">$89</span><span class="unit">/ month</span></div>
+          <div class="price-features">
+            <div class="price-feature"><svg class="icon" aria-hidden="true"><use href="#icon-check-circle"></use></svg> Unlimited visits</div>
+            <div class="price-feature"><svg class="icon" aria-hidden="true"><use href="#icon-check-circle"></use></svg> Two guest passes / month</div>
+            <div class="price-feature"><svg class="icon" aria-hidden="true"><use href="#icon-check-circle"></use></svg> No initiation fee</div>
+          </div>
+          <a href="#contact" class="btn btn-outline btn-block">Become a member</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TEAM ============ -->
+  <section class="team section-alt" id="team">
+    <div class="container">
+      <div class="section-head" data-reveal><p class="eyebrow">WHO'S COACHING</p><h2>Four coaches, one grading key</h2></div>
+      <div class="grid team-grid">
+        <div class="team-card" data-reveal><div class="team-avatar" style="background:linear-gradient(135deg,var(--yellow),var(--red))">RA</div><h4>Robin Achebe</h4><p class="team-role">Head Route-Setter</p><p class="team-bio">Sets most of the purple tape. Will not confirm or deny how long Setter's Revenge took to build.</p><a href="#" class="team-social" aria-label="Robin on Instagram">IG</a></div>
+        <div class="team-card" data-reveal><div class="team-avatar" style="background:linear-gradient(135deg,var(--blue),var(--purple))">DK</div><h4>Dana Kessler</h4><p class="team-role">Beginner Program Lead</p><p class="team-bio">Taught over 400 people to fall correctly before teaching them to climb.</p><a href="#" class="team-social" aria-label="Dana on Instagram">IG</a></div>
+        <div class="team-card" data-reveal><div class="team-avatar" style="background:linear-gradient(135deg,var(--red),var(--purple))">MF</div><h4>Marcus Feld</h4><p class="team-role">Coach &amp; Setter</p><p class="team-bio">Former competition climber. Explains beta with his whole body, whether you asked or not.</p><a href="#" class="team-social" aria-label="Marcus on Instagram">IG</a></div>
+        <div class="team-card" data-reveal><div class="team-avatar" style="background:linear-gradient(135deg,var(--yellow),var(--blue))">YT</div><h4>Yuki Tanaka</h4><p class="team-role">Youth Program Coach</p><p class="team-bio">Runs the after-school squads. Knows every kid's name and their current project.</p><a href="#" class="team-social" aria-label="Yuki on Instagram">IG</a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCHEDULE ============ -->
+  <section class="schedule" id="schedule">
+    <div class="container">
+      <div class="section-head" data-reveal><p class="eyebrow">THIS WEEK</p><h2>Class schedule</h2><p>Open bouldering runs all day, every day — these are the coached sessions on top of that.</p></div>
+      <div class="schedule-tabs" id="scheduleTabs">
+        <button class="schedule-tab is-active" data-day="mon">Mon</button>
+        <button class="schedule-tab" data-day="tue">Tue</button>
+        <button class="schedule-tab" data-day="wed">Wed</button>
+        <button class="schedule-tab" data-day="thu">Thu</button>
+        <button class="schedule-tab" data-day="fri">Fri</button>
+        <button class="schedule-tab" data-day="sat">Sat</button>
+        <button class="schedule-tab" data-day="sun">Sun</button>
+      </div>
+
+      <div class="schedule-panel is-active" data-day="mon">
+        <div class="schedule-row"><span class="schedule-time">6:00 PM</span><div><h4>Beginner Basics</h4><p>Footwork, falling, and your first routes.</p></div><span class="grade-badge grade-yellow"><span class="dot"></span>Intro</span></div>
+        <div class="schedule-row"><span class="schedule-time">4:00 PM</span><div><h4>Youth Squad</h4><p>Ages 8–17, grouped by experience.</p></div><span class="grade-badge grade-blue"><span class="dot"></span>All levels</span></div>
+      </div>
+      <div class="schedule-panel" data-day="tue">
+        <div class="schedule-row"><span class="schedule-time">7:00 PM</span><div><h4>Women's Climb Night</h4><p>A relaxed, coached session — all levels welcome.</p></div><span class="grade-badge grade-blue"><span class="dot"></span>All levels</span></div>
+      </div>
+      <div class="schedule-panel" data-day="wed">
+        <div class="schedule-row"><span class="schedule-time">6:00 PM</span><div><h4>Beginner Basics</h4><p>Footwork, falling, and your first routes.</p></div><span class="grade-badge grade-yellow"><span class="dot"></span>Intro</span></div>
+        <div class="schedule-row"><span class="schedule-time">8:00 PM</span><div><h4>Route Preview</h4><p>Members get first look at next week's reset.</p></div><span class="grade-badge grade-purple"><span class="dot"></span>Members</span></div>
+      </div>
+      <div class="schedule-panel" data-day="thu">
+        <div class="schedule-row"><span class="schedule-time">4:00 PM</span><div><h4>Youth Squad</h4><p>Ages 8–17, grouped by experience.</p></div><span class="grade-badge grade-blue"><span class="dot"></span>All levels</span></div>
+        <div class="schedule-row"><span class="schedule-time">6:30 PM</span><div><h4>Strength &amp; Conditioning</h4><p>Off-wall training for climbing-specific strength.</p></div><span class="grade-badge grade-red"><span class="dot"></span>Advanced</span></div>
+      </div>
+      <div class="schedule-panel" data-day="fri">
+        <div class="schedule-row"><span class="schedule-time">7:00 PM</span><div><h4>Friday Night Send Session</h4><p>Loud music, new problems, low stakes.</p></div><span class="grade-badge grade-blue"><span class="dot"></span>All levels</span></div>
+      </div>
+      <div class="schedule-panel" data-day="sat">
+        <div class="schedule-row"><span class="schedule-time">9:00 AM</span><div><h4>Family Climb Morning</h4><p>Quiet hours before we open to the public.</p></div><span class="grade-badge grade-yellow"><span class="dot"></span>All ages</span></div>
+        <div class="schedule-row"><span class="schedule-time">11:00 AM</span><div><h4>Beginner Basics</h4><p>Footwork, falling, and your first routes.</p></div><span class="grade-badge grade-yellow"><span class="dot"></span>Intro</span></div>
+      </div>
+      <div class="schedule-panel" data-day="sun">
+        <div class="schedule-row"><span class="schedule-time">1:00 PM</span><div><h4>Community Comp</h4><p>First Sunday of the month — casual, all grades.</p></div><span class="grade-badge grade-purple"><span class="dot"></span>All levels</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ JOURNAL ============ -->
+  <section class="journal section-alt" id="journal">
+    <div class="container">
+      <div class="section-head" data-reveal><p class="eyebrow">FROM THE GYM</p><h2>Journal</h2></div>
+      <div class="grid journal-grid">
+        <article class="journal-card" data-reveal><div class="journal-thumb" style="background:linear-gradient(135deg,var(--yellow),var(--red))"><span class="journal-tag">Technique</span></div><div class="journal-meta"><span>Mar 4, 2026</span><span>5 min read</span></div><h3>Why your arms give out before your legs should</h3><p>The most common beginner habit, and the drill we use to break it.</p><a href="#" class="journal-read">Read the post <svg class="icon" aria-hidden="true"><use href="#icon-arrow-up-right"></use></svg></a></article>
+        <article class="journal-card" data-reveal><div class="journal-thumb" style="background:linear-gradient(135deg,var(--blue),var(--purple))"><span class="journal-tag">Setting</span></div><div class="journal-meta"><span>Feb 18, 2026</span><span>7 min read</span></div><h3>How we actually grade a route</h3><p>Behind the scenes on what turns a new problem into yellow, blue, red or purple tape.</p><a href="#" class="journal-read">Read the post <svg class="icon" aria-hidden="true"><use href="#icon-arrow-up-right"></use></svg></a></article>
+        <article class="journal-card" data-reveal><div class="journal-thumb" style="background:linear-gradient(135deg,var(--red),var(--yellow))"><span class="journal-tag">Gear</span></div><div class="journal-meta"><span>Jan 22, 2026</span><span>4 min read</span></div><h3>Do you actually need your own shoes yet?</h3><p>A honest answer from people who rent shoes for a living.</p><a href="#" class="journal-read">Read the post <svg class="icon" aria-hidden="true"><use href="#icon-arrow-up-right"></use></svg></a></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="faq" id="faq">
+    <div class="container">
+      <div class="section-head center" data-reveal><p class="eyebrow" style="justify-content:center;">BEFORE YOUR FIRST VISIT</p><h2>Questions we get a lot</h2></div>
+      <div class="faq-list">
+        <div class="faq-item is-open" data-reveal><button class="faq-question" aria-expanded="true">What should I wear?<svg class="icon" aria-hidden="true"><use href="#icon-chevron-down"></use></svg></button><div class="faq-answer"><p>Anything you can move in — leggings or shorts, a t-shirt. Avoid jeans and anything with a big belt buckle, which the wall will find.</p></div></div>
+        <div class="faq-item" data-reveal><button class="faq-question" aria-expanded="false">Do I need my own gear?<svg class="icon" aria-hidden="true"><use href="#icon-chevron-down"></use></svg></button><div class="faq-answer"><p>No — shoes and chalk are included with every visit. Most people don't buy their own shoes until they're climbing regularly.</p></div></div>
+        <div class="faq-item" data-reveal><button class="faq-question" aria-expanded="false">Is bouldering safe without ropes?<svg class="icon" aria-hidden="true"><use href="#icon-chevron-down"></use></svg></button><div class="faq-answer"><p>Routes stay low enough that you fall onto thick padded flooring, not a rope. We'll teach you how to fall in your orientation.</p></div></div>
+        <div class="faq-item" data-reveal><button class="faq-question" aria-expanded="false">What age can kids start?<svg class="icon" aria-hidden="true"><use href="#icon-chevron-down"></use></svg></button><div class="faq-answer"><p>Open bouldering is fine from about age 6 with a supervising adult. Youth Squad classes start at 8.</p></div></div>
+        <div class="faq-item" data-reveal><button class="faq-question" aria-expanded="false">How fit do I need to be?<svg class="icon" aria-hidden="true"><use href="#icon-chevron-down"></use></svg></button><div class="faq-answer"><p>Not very. Climbing uses muscles you don't usually train, so almost everyone starts from the same place regardless of general fitness.</p></div></div>
+        <div class="faq-item" data-reveal><button class="faq-question" aria-expanded="false">Can I cancel my membership anytime?<svg class="icon" aria-hidden="true"><use href="#icon-chevron-down"></use></svg></button><div class="faq-answer"><p>Yes, month to month with no lock-in contract. We'd rather earn your visits than trap you into them.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CTA BANNER ============ -->
+  <section class="cta-banner">
+    <div class="container">
+      <h2 data-reveal="fade">Ready to try your first route?</h2>
+      <p data-reveal="fade">Your first day pass includes gear rental and a walkthrough. No experience required, no judgment either.</p>
+      <a href="#contact" class="btn btn-primary" data-reveal="fade">Book a day pass<svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg></a>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section class="contact" id="contact">
+    <div class="container grid contact-grid">
+      <div data-reveal>
+        <p class="eyebrow">VISIT US</p>
+        <h2>Come climb something</h2>
+        <p class="lede" style="margin:1rem 0 2.5rem;">Fill in the form or just show up during open hours — a coach can always get you started.</p>
+        <div class="contact-info-item"><div class="icon-wrap"><svg class="icon" aria-hidden="true"><use href="#icon-map-pin"></use></svg></div><div><h4>Find the gym</h4><p>219 Boulder Row<br>Denver, CO 80205</p></div></div>
+        <div class="contact-info-item"><div class="icon-wrap"><svg class="icon" aria-hidden="true"><use href="#icon-mail"></use></svg></div><div><h4>Email us</h4><p>climb@cruxgym.co</p></div></div>
+        <div class="contact-info-item"><div class="icon-wrap"><svg class="icon" aria-hidden="true"><use href="#icon-clock"></use></svg></div><div><h4>Open hours</h4><p>Mon–Fri 6am–11pm · Sat–Sun 8am–10pm</p></div></div>
+      </div>
+      <div class="contact-form-wrap" data-reveal>
+        <form id="contactForm" novalidate>
+          <div class="field" id="field-name"><label for="cf-name">Name</label><input type="text" id="cf-name" name="name" placeholder="Your name" autocomplete="name"><span class="error-msg"></span></div>
+          <div class="field" id="field-email"><label for="cf-email">Email</label><input type="email" id="cf-email" name="email" placeholder="you@example.com" autocomplete="email"><span class="error-msg"></span></div>
+          <div class="field" id="field-type"><label for="cf-type">What brings you in</label><select id="cf-type" name="type"><option value="">Choose one</option><option>First-time visit</option><option>Membership question</option><option>Youth program</option><option>Private coaching</option><option>Something else</option></select><span class="error-msg"></span></div>
+          <div class="field" id="field-message"><label for="cf-message">Message</label><textarea id="cf-message" name="message" placeholder="Tell us a bit about what you're looking for."></textarea><span class="error-msg"></span></div>
+          <button type="submit" class="btn btn-primary btn-block">Send it over<svg class="icon" aria-hidden="true"><use href="#icon-send"></use></svg></button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="grid footer-grid">
+      <div>
+        <a href="#home" class="logo"><svg class="logo-mark" viewBox="0 0 32 26" aria-hidden="true"><path d="M1 25 L10 8 L15 16 L20 6 L31 25 Z"/></svg>Crux</a>
+        <p class="footer-blurb">An indoor bouldering and climbing gym. Routes reset weekly, coaching for every level, in Denver.</p>
+        <div class="footer-social"><a href="#" aria-label="Instagram">IG</a><a href="#" aria-label="X (Twitter)">X</a><a href="#" aria-label="Email">@</a></div>
+      </div>
+      <div><h4>Quick links</h4><nav class="footer-links"><a href="#gym">The gym</a><a href="#services">Classes</a><a href="#routes">Routes</a><a href="#pricing">Membership</a><a href="#contact">Contact</a></nav></div>
+      <div><h4>Programs</h4><nav class="footer-links"><a href="#services">Open bouldering</a><a href="#services">Beginner classes</a><a href="#services">Youth squad</a><a href="#services">Private coaching</a><a href="#schedule">Schedule</a></nav></div>
+      <div>
+        <h4>Gym updates</h4>
+        <p>New route resets, event nights, and the occasional closure notice. Sent about twice a month.</p>
+        <form class="footer-newsletter-form" id="newsletterForm"><label for="nl-email" class="sr-only">Email address</label><input type="email" id="nl-email" name="nl-email" placeholder="you@example.com"><button type="submit" aria-label="Subscribe"><svg class="icon" aria-hidden="true"><use href="#icon-send"></use></svg></button></form>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; <span id="year"></span> Crux Climbing Co. All rights reserved.</p>
+      <div class="footer-legal"><a href="#">Privacy</a><a href="#">Terms</a></div>
+    </div>
+  </div>
+</footer>
+
+<button class="back-to-top" id="backToTop" aria-label="Back to top"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-up"></use></svg></button>
+
+<div class="toast" id="toast"><svg class="icon" aria-hidden="true"><use href="#icon-check-circle"></use></svg><span id="toastMessage">Message sent.</span></div>
+
+<div class="modal-overlay" id="portfolioModal">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" id="modalClose" aria-label="Close"><svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg></button>
+    <div class="modal-thumb" id="modalThumb"></div>
+    <p class="eyebrow" id="modalCat">CATEGORY</p>
+    <h3 id="modalTitle">Route title</h3>
+    <p id="modalNote">Note about the route.</p>
+    <div class="modal-specs">
+      <div><strong>Setter</strong><span id="modalClient">—</span></div>
+      <div><strong>Height</strong><span id="modalPaper">—</span></div>
+      <div><strong>Wall angle</strong><span id="modalRun">—</span></div>
+      <div><strong>Grade</strong><span id="modalColors">—</span></div>
+    </div>
+    <a href="#contact" class="btn btn-primary btn-block" id="modalCta">Book a session</a>
+  </div>
+</div>
+
+<script>
+// SCRIPT_PLACEHOLDER
+</script>
+</body>
+</html>
