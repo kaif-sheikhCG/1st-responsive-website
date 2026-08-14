@@ -67,7 +67,7 @@ def battle_simulation():
     # Game Over logic
     print("🏆 BATTLE OVER 🏆")
     if player_health > 0:
-        print("🎉 Victory! You defeated the monster and survived!")
+        print("🎉 Victory! You defeated the monster and survived yayyyy!")
     else:
         print("💀 Defeat! The monster overpowered you. Game Over.")
 
