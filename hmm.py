@@ -48,7 +48,7 @@ def battle_simulation():
             time.sleep(1)
 
         # 3. Monster Turn
-        print("👹 The monster prepares to counter-attack...")
+        print("👹 The monstter prepares to counter-attack...")
         time.sleep(1)
         
         # Monster damage range

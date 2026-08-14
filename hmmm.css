@@ -1,0 +1,28 @@
+.box {
+  width: random(100px, 300px);
+  background-color: hsl(random(0, 360) 50% 50%);
+}
+/* Same random width and height per element */
+.square {
+  width: random(--size, 50px, 200px);
+  height: random(--size, 50px, 200px);
+}
+
+/* All elements share the same random size */
+.shared-square {
+  width: random(element-shared, 50px, 200px);
+  height: random(element-shared, 50px, 200px);
+}   
+.star {
+  background: white;
+  border-radius: 50%;
+  position: fixed;
+  width: random(2px, 5px);
+  top: random(0%, 100%);
+  left: random(0%, 100%);
+  opacity: random(0.5, 1);
+}   
+/* Only 10px, 20px, 30px, etc. */
+.step-size {
+  width: random(10px, 50px, by 10px);
+}   
